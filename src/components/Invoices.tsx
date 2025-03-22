@@ -1,4 +1,3 @@
-// src/renderer/Invoice.tsx
 import React, { useState, useEffect } from 'react';
 
 const Invoice = () => {
@@ -8,74 +7,50 @@ const Invoice = () => {
     invoiceDate: '',
     dueDate: '',
     totalAmount: '',
-    status: '',
+    status: 'Pending',
   });
 
-  useEffect(() => {
-    const fetchInvoices = async () => {
-      const data = await window.electron.ipcRenderer.invoke('get-invoices');
-      setInvoices(data);
-    };
+  const fetchInvoices = async () => {
+    const data = await window.electron.ipcRenderer.invoke('get-invoices');
+    setInvoices(data);
+  };
 
+  useEffect(() => {
     fetchInvoices();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const invoiceId = await window.electron.ipcRenderer.invoke('create-invoice', newInvoice);
-    setNewInvoice({
-      customerId: '',
-      invoiceDate: '',
-      dueDate: '',
-      totalAmount: '',
-      status: '',
-    });
-    setInvoices([...invoices, { ...newInvoice, InvoiceID: invoiceId }]);
+    await window.electron.ipcRenderer.invoke('create-invoice', newInvoice);
+    fetchInvoices(); // Refresh the invoice list
+    setNewInvoice({ customerId: '', invoiceDate: '', dueDate: '', totalAmount: '', status: 'Pending' });
   };
 
   return (
     <div>
       <h2>Invoices</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Customer ID"
-          value={newInvoice.customerId}
-          onChange={(e) => setNewInvoice({ ...newInvoice, customerId: e.target.value })}
-        />
-        <input
-          type="date"
-          value={newInvoice.invoiceDate}
-          onChange={(e) => setNewInvoice({ ...newInvoice, invoiceDate: e.target.value })}
-        />
-        <input
-          type="date"
-          value={newInvoice.dueDate}
-          onChange={(e) => setNewInvoice({ ...newInvoice, dueDate: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Total Amount"
-          value={newInvoice.totalAmount}
-          onChange={(e) => setNewInvoice({ ...newInvoice, totalAmount: e.target.value })}
-        />
-        <select
-          value={newInvoice.status}
-          onChange={(e) => setNewInvoice({ ...newInvoice, status: e.target.value })}
-        >
-          <option value="Pending">Pending</option>
-          <option value="Paid">Paid</option>
-          <option value="Overdue">Overdue</option>
+      <form onSubmit={handleSubmit} className="invoice-form">
+        {['customerId', 'invoiceDate', 'dueDate', 'totalAmount'].map((field) => (
+          <input
+            key={field}
+            type={field === 'totalAmount' ? 'number' : 'text'}
+            placeholder={field.replace(/([A-Z])/g, ' $1')}
+            value={newInvoice[field as keyof typeof newInvoice]}
+            onChange={(e) => setNewInvoice({ ...newInvoice, [field]: e.target.value })}
+          />
+        ))}
+        <select value={newInvoice.status} onChange={(e) => setNewInvoice({ ...newInvoice, status: e.target.value })}>
+          {['Pending', 'Paid', 'Overdue'].map((status) => (
+            <option key={status} value={status}>{status}</option>
+          ))}
         </select>
         <button type="submit">Create Invoice</button>
       </form>
 
       <h3>Existing Invoices</h3>
       <ul>
-        {invoices.map((invoice) => (
-          <li key={invoice.InvoiceID}>
-            {invoice.InvoiceID} - {invoice.TotalAmount} - {invoice.Status}
-          </li>
+        {invoices.map(({ InvoiceID, TotalAmount, Status }) => (
+          <li key={InvoiceID}>{`#${InvoiceID} - $${TotalAmount} - ${Status}`}</li>
         ))}
       </ul>
     </div>

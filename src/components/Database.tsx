@@ -19,7 +19,8 @@ export const openDb = async () => {
       LastName TEXT,
       Email TEXT,
       Phone TEXT,
-      Address TEXT,
+      Address1 TEXT,
+      Address2 TEXT,
       City TEXT,
       State TEXT,
       ZipCode TEXT
