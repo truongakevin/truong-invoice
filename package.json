@@ -36,6 +36,8 @@
     "fork-ts-checker-webpack-plugin": "^8.0.0",
     "node-loader": "^2.0.0",
     "postcss-loader": "^7.3.3",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
     "style-loader": "^3.3.3",
     "ts-loader": "^9.4.4",
     "ts-node": "^10.9.1",
