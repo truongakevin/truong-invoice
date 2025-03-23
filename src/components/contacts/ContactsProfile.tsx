@@ -12,6 +12,10 @@ const ContactsProfile = ({
 	const [contactDetails, setContactDetails] = useState<any | null>(null);
   const [isEditing, setIsEditing] = useState(false);
 
+  const capitalizeFirstLetter = (text: string) => {
+		return text.charAt(0).toUpperCase() + text.slice(1);
+	};
+  
   const fetchContactDetails = async () => {
     try {
       const response = await window.electron.ipcRenderer.invoke('get-contact-details', { firstName: contact.FirstName, lastName: contact.LastName });
@@ -25,7 +29,7 @@ const ContactsProfile = ({
     const { name, value } = e.target;
     setContactDetails((prevDetails: any) => ({
       ...prevDetails,
-      [name]: value,
+      [name]: name === "FirstName" || name === "LastName" ? capitalizeFirstLetter(value) : value,
     }));
   };
 

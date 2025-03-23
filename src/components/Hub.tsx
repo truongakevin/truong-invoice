@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Invoices from './Invoices';
-import Contacts from './ContactsPage';
+import Contacts from './contacts/ContactsPage';
 // import Estimates from './Estimates';
 // import Payments from './Payments';
 
