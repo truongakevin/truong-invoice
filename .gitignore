@@ -93,4 +93,4 @@ out/
 .idea/
 
 # databsee
-./invoiceApp.db
+invoiceApp.db
