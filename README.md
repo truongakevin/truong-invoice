@@ -1,47 +1,42 @@
-# 🚀 Electron React TypeScript Tailwind Starter
+# Truong Invoice Managment Application
 
-This starter repository provides a ready-to-use project template for building cross-platform desktop applications with Electron, React, TypeScript, and Tailwind CSS, utilizing Electron Forge for easy packaging and publishing.
+A desktop application for managing invoices, clients, and payments. Built with **Electron**, **React**, **TypeScript**, and **SQLite**, this app provides an efficient way to track business transactions while keeping data stored locally.
 
 ## Features
-- Electron for building cross-platform desktop applications
-- React for creating scalable, component-based UIs
-- TypeScript for strongly-typed and maintainable JavaScript code
-- Tailwind CSS for utility-first styling and rapid UI development
-- Electron Forge for simple packaging and publishing of Electron applications
+- **Invoice Management**: Create, edit, and track invoices.
+- **Client Management**: Add and update client contact information.
+- **Estimates & Payments**: Generate estimates and log payments.
+- **Local Storage**: Uses SQLite for persistent data storage.
+- **Electron-based**: Runs as a cross-platform desktop app.
+
+## Tech Stack
+- **Frontend**: React, TypeScript, Tailwind CSS
+- **Backend**: Electron, SQLite (SQLite3)
+- **IPC Communication**: Electron `ipcMain` & `ipcRenderer`
+
+## Screenshots
 
 
-## Getting Started
-Clone the repository:
+## Installation
+### **Prerequisites**
+- Node.js (>= 16)
+- npm
+
+### **Clone and Install Dependencies**
 ```bash
-git clone https://github.com/rostislavjadavan/electron-react-typescript-tailwind-starter.git
-```
-
-Navigate to the project folder:
-```bash
-cd electron-react-typescript-tailwind-starter
-```
-
-Install dependencies:
-```bash
+git clone https://github.com/yourusername/truong-invoice.git
+cd truong-invoice
 npm install
 ```
-
-Start the development server:
+### Run the App
 ```bash
-npm run start
+npm run electron:dev
 ```
 
-# Package the project
+## Contributing
 
-Package the project as an Electron app:
+Contributions are welcome! Feel free to submit issues and pull requests.
 
-```bash
-npm run make
-```
+## License
 
-For detailed configuration visit: https://www.electronforge.io
-
-## Customization
-
-You can easily customize the project to suit your needs by modifying the source code within the `src` directory. The project is set up with a simple example that you can use as a starting point for your application.
-
+This project is licensed under the MIT License.
