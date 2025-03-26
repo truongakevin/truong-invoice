@@ -8,21 +8,6 @@ export const setDatabase = (database: Database) => {
   db = database;
 };
 
-// Create an invoice
-ipcMain.handle('create-invoice', async (event, invoice: { customerID: number, invoiceDate: string, dueDate: string, totalAmount: number, status: string }) => {
-  const { customerID, invoiceDate, dueDate, totalAmount, status } = invoice;
-  const result = await db.run(
-    "INSERT INTO Invoices (CustomerID, InvoiceDate, DueDate, TotalAmount, Status) VALUES (?, ?, ?, ?, ?)",
-    [customerID, invoiceDate, dueDate, totalAmount, status]
-  );
-  return { InvoiceID: result.lastID };
-});
-
-// Get all invoices
-ipcMain.handle('get-invoices', async () => {
-  return await db.all("SELECT * FROM Invoices");
-});
-
 // Create a contact
 ipcMain.handle('create-contact', async (event, contact: { firstName: string, lastName: string, email: string, phone: string, address1: string, address2: string, city: string, state: string, zipCode: string }) => {
   const { firstName, lastName, email, phone, address1, address2, city, state, zipCode } = contact;
@@ -57,3 +42,40 @@ ipcMain.handle('delete-contact', async (event, customerID: number) => {
   await db.run("DELETE FROM Customers WHERE CustomerID = ?", [customerID]);
   return { message: "Contact deleted successfully" };
 });
+
+// Create an invoice
+
+
+
+ipcMain.handle('create-invoice', async (event, invoice: { customerID: number, invoiceDate: string, dueDate: string, totalAmount: number, paidAmount: number, dueAmount: number, status: string }) => {
+  const { customerID, invoiceDate, dueDate, totalAmount, paidAmount, dueAmount, status } = invoice;
+  const result = await db.run(
+    "INSERT INTO Invoices (customerID, invoiceDate, dueDate, totalAmount, paidAmount, dueAmount, status) VALUES (?, ?, ?, ?, ?, ?, ?)",
+    [customerID, invoiceDate, dueDate, totalAmount, paidAmount, dueAmount, status]
+  );
+  console.log(invoice);
+  return { InvoiceID: result.lastID };
+});
+
+// Get all invoices
+ipcMain.handle('get-invoices', async () => {
+  return await db.all("SELECT * FROM Invoices");
+});
+
+// Create an invoice
+ipcMain.handle('create-invoice-item', async (event, invoiceItem: { invoiceID: number, serviceDescription: string, serviceDate: string, quantity: number, rate: number }) => {
+  const { invoiceID, serviceDate, serviceDescription, quantity, rate } = invoiceItem;
+  console.log(invoiceID, serviceDate, serviceDescription, quantity, rate);
+  await db.run(
+    "INSERT INTO InvoiceItems (InvoiceID, ServiceDate, ServiceDescription, Quantity, Rate) VALUES (?, ?, ?, ?, ?)",
+    [invoiceID, serviceDate, serviceDescription, quantity, rate]
+  );
+  return { message: "Invoice item added successfully" };
+});
+
+
+// Get all invoices
+ipcMain.handle('get-invoice-items', async () => {
+  return await db.all("SELECT * FROM InvoiceItems");
+});
+

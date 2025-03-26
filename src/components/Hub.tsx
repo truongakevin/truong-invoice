@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import Invoices from './Invoices';
-import Contacts from './contacts/ContactsPage';
+import InvoicesPage from './invoices/InvoicesPage';
+import ContactsPage from './contacts/ContactsPage';
 // import Estimates from './Estimates';
 // import Payments from './Payments';
 
 const Hub: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('contacts');
+  const [activeTab, setActiveTab] = useState('invoices');
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -29,8 +29,8 @@ const Hub: React.FC = () => {
 
       {/* Tab Content */}
       <div className="py-4 px-24 bg-gray-100">
-        {activeTab === 'invoices' && <Invoices />}
-        {activeTab === 'contacts' && <Contacts />}
+        {activeTab === 'invoices' && <InvoicesPage />}
+        {activeTab === 'contacts' && <ContactsPage />}
         {/* {activeTab === 'estimates' && <Estimates />}
         {activeTab === 'payments' && <Payments />} */}
       </div>

@@ -34,6 +34,8 @@ export const openDb = async () => {
       InvoiceDate TEXT,
       DueDate TEXT,
       TotalAmount REAL,
+      PaidAmount REAL,
+      DueAmount REAL,
       Status TEXT,
       FOREIGN KEY(CustomerID) REFERENCES Customers(CustomerID)
     );
@@ -44,13 +46,37 @@ export const openDb = async () => {
       InvoiceItemID INTEGER PRIMARY KEY AUTOINCREMENT,
       InvoiceID INTEGER,
       ServiceDescription TEXT,
+      ServiceDate TEXT,
       Quantity INTEGER,
       Rate REAL,
-      LineTotal REAL,
       FOREIGN KEY(InvoiceID) REFERENCES Invoices(InvoiceID)
     );
   `);
 
   console.log('Database tables checked/created');
+
+  // await db.exec(`
+  //   CREATE TRIGGER IF NOT EXISTS calculate_due_amount_after_insert
+  //   AFTER INSERT ON Invoices
+  //   FOR EACH ROW
+  //   BEGIN
+  //     UPDATE Invoices
+  //     SET DueAmount = NEW.TotalAmount - NEW.PaidAmount
+  //     WHERE InvoiceID = NEW.InvoiceID;
+  //   END;
+  // `);
+  
+  // await db.exec(`
+  //   CREATE TRIGGER IF NOT EXISTS calculate_due_amount_after_update
+  //   AFTER UPDATE ON Invoices
+  //   FOR EACH ROW
+  //   BEGIN
+  //     UPDATE Invoices
+  //     SET DueAmount = NEW.TotalAmount - NEW.PaidAmount
+  //     WHERE InvoiceID = NEW.InvoiceID;
+  //   END;
+  // `);
+  
+  console.log('Database triggers checked/created');
   return db;
 };
