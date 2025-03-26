@@ -25,12 +25,18 @@ const ContactsProfile = ({
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setContactDetails((prevDetails: any) => ({
       ...prevDetails,
       [name]: name === "FirstName" || name === "LastName" ? capitalizeFirstLetter(value) : value,
     }));
+    try {
+      await window.electron.ipcRenderer.invoke('update-contact', contactDetails);
+      fetchContacts();
+    } catch (error) {
+      console.error('Error saving contact:', error);
+    }
   };
 
   const handleSave = async () => {
@@ -66,11 +72,19 @@ const ContactsProfile = ({
   if (!contactDetails) return <div>Loading...</div>;
 
   return (
-    <div className="w-5/12 h-full bg-gray-50 p-4 border-2 rounded-lg shadow-md">
+    <div className="bg-gray-50 p-4 border-2 rounded-lg shadow-md">
       {!isEditing ? (
         <div className='w-full m-auto flex flex-col gap-3'>
           <div className='flex flex-col gap-0'>
-            <h2 className="text-3xl font-semibold mb-4">{contactDetails.FirstName} {contactDetails.LastName}</h2>
+            <div className="flex flex-row justify-between">
+              <div className='flex flex-row'>
+                <h2 className="text-2xl font-semibold mb-2 justify-end">{contactDetails.FirstName} {contactDetails.LastName}</h2>
+                {/* <button onClick={() => setIsEditing(true)} className="font-semibold text-lg text-black px-6 h- justify-center transition">Edit</button> */}
+              </div>
+              {/* <button onClick={() => setSelectedContact(null)}  className="font-bold text-2xl text-black px-2 h-min justify-start hover:text-gray-400 transition">
+                &times;
+              </button> */}
+            </div>
             {contactDetails.Email && <p className="text-xl text-gray-700"><strong>Email:</strong> {contactDetails.Email}</p>}
             {contactDetails.Phone && <p className="text-xl text-gray-700"><strong>Phone:</strong> {contactDetails.Phone}</p>}
             <p className="text-xl text-gray-700"><strong>Address:</strong></p>
@@ -171,8 +185,8 @@ const ContactsProfile = ({
             />
           </div>
           <div className='flex flex-row gap-2'>
-            <button onClick={handleSave} className="font-semibold text-lg bg-green-600 text-white rounded-lg shadow-lg px-6 py-2 h-min hover:bg-green-700 transition">Save</button>
             <button onClick={() => setIsEditing(false)} className="font-semibold text-lg bg-gray-600 text-white rounded-lg shadow-lg px-6 py-2 h-min hover:bg-gray-700 transition">Cancel</button>
+            <button onClick={handleSave} className="font-semibold text-lg bg-green-600 text-white rounded-lg shadow-lg px-6 py-2 h-min hover:bg-green-700 transition">Save</button>
           </div>
         </div>
       )}

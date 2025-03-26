@@ -2,8 +2,8 @@ import React from 'react';
 
 const ContactsSearchBar = ({ query, setQuery }: { query: string, setQuery: React.Dispatch<React.SetStateAction<string>> }) => {
   return (
-    <div className="w-1/2">
-      <h2 className="text-2xl font-semibold py-2">
+    <div className="w-full">
+      <h2 className="text-3xl font-semibold py-2">
         Search Contact
       </h2>
       <input
