@@ -1,5 +1,6 @@
-INSERT INTO Customers (FirstName, LastName, Email, Phone, Address1, City, State, ZipCode)
-VALUES 
+-- Insert Sample Contacts
+INSERT INTO Customers (FirstName, LastName, Email, Phone, Address1, City, State, ZipCode) VALUES 
+('Kevin', 'Truong', 'thekevoness@gmail.com', '7202246183', '11708 Montgomery Circle', 'Longmont', 'CO', '80504'),
 ('John', 'Doe', 'john.doe@example.com', '3031234567', '123 Main St', 'Denver', 'CO', '80202'),
 ('Jane', 'Smith', 'jane.smith@example.com', '7202345678', '456 Elm St', 'Boulder', 'CO', '80301'),
 ('Michael', 'Johnson', 'michael.johnson@example.com', '9703456789', '789 Oak St', 'Colorado Springs', 'CO', '80918'),
@@ -37,3 +38,31 @@ VALUES
 ('Grayson', 'Parker', 'grayson.parker@example.com', '9705678901', '2323 Plum St', 'Vail', 'CO', '81657'),
 ('Scarlett', 'Collins', 'scarlett.collins@example.com', '7196789012', '2424 Oakwood St', 'Aspen', 'CO', '81611'),
 ('Hudson', 'Edwards', 'hudson.edwards@example.com', '3037890123', '2525 Cedar St', 'Telluride', 'CO', '81435');
+
+-- Insert sample invoices
+INSERT INTO Invoices (CustomerID, InvoiceDate, DueDate, TotalAmount, PaidAmount, DueAmount, Status) VALUES
+(1, '2025-03-01', '2025-03-15', 500.00, 250.00, 250.00, 'Pending'),
+(2, '2025-03-05', '2025-03-20', 350.00, 0.00, 350.00, 'Pending'),
+(3, '2025-03-10', '2025-03-25', 1000.00, 500.00, 500.00, 'Paid'),
+(4, '2025-03-12', '2025-03-26', 150.00, 150.00, 0.00, 'Paid'),
+(5, '2025-03-15', '2025-03-30', 800.00, 0.00, 800.00, 'Pending'),
+(6, '2025-03-18', '2025-04-02', 200.00, 0.00, 200.00, 'Pending'),
+(7, '2025-03-20', '2025-04-04', 600.00, 300.00, 300.00, 'Pending'),
+(8, '2025-03-22', '2025-04-06', 400.00, 0.00, 400.00, 'Pending'),
+(9, '2025-03-25', '2025-04-09', 700.00, 700.00, 0.00, 'Paid'),
+(10, '2025-03-28', '2025-04-12', 900.00, 0.00, 900.00, 'Pending');
+
+-- Insert sample invoice items
+INSERT INTO InvoiceItems (InvoiceID, ServiceDescription, ServiceDate, Quantity, Rate) VALUES
+(1, 'Web Development', '2025-03-01', 10, 50.00),
+(1, 'SEO Optimization', '2025-03-02', 5, 30.00),
+(2, 'Consulting Services', '2025-03-05', 7, 45.00),
+(3, 'Graphic Design', '2025-03-10', 15, 60.00),
+(3, 'Branding Package', '2025-03-10', 10, 100.00),
+(4, 'Product Photography', '2025-03-12', 8, 20.00),
+(5, 'Website Hosting', '2025-03-15', 12, 50.00),
+(6, 'Email Marketing', '2025-03-18', 4, 50.00),
+(7, 'App Development', '2025-03-20', 5, 100.00),
+(8, 'Content Creation', '2025-03-22', 3, 60.00),
+(9, 'UI/UX Design', '2025-03-25', 6, 80.00),
+(10, 'Cloud Hosting', '2025-03-28', 10, 70.00);
