@@ -16,17 +16,19 @@ if (require('electron-squirrel-startup')) {
 }
 
 const createWindow = (): void => {
+  const scale = .864;
+  const win_height = Math.round(900*scale);
+  const win_width = Math.round((1600-56)*scale);
+  console.log(win_height)
+  console.log(win_width)
   const mainWindow = new BrowserWindow({
-    // height: 720,
-    // width: 1200,
-    height: 900,
-    width: 1600,
+    height: win_height,
+    width: win_width,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: false,
     },
   });
-
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
   mainWindow.webContents.openDevTools();
 };
