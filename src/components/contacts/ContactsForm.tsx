@@ -1,34 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const ContactsForm = ({
-	handleSubmit,
-	newContact,
-	setNewContact,
+	fetchContacts,
 	setShowForm,
 }: {
-	handleSubmit: (e: React.FormEvent) => void;
-	newContact: any;
-	setNewContact: React.Dispatch<React.SetStateAction<any>>;
+	fetchContacts: () => void;
 	setShowForm: (state: boolean) => void;
 }) => {
+	const [newContact, setNewContact] = useState({
+		firstName: '',
+		lastName: '',
+		email: '',
+		phone: '',
+		address1: '',
+		address2: '',
+		city: '',
+		state: '',
+		zipCode: '',
+	});
+
 	const capitalizeFirstLetter = (text: string) => {
 		return text.charAt(0).toUpperCase() + text.slice(1);
 	};
+	
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
 			e.preventDefault();
-
 			const form = e.currentTarget.form;
-			if (!form) return;
-
-			const index = Array.from(form.elements).indexOf(e.currentTarget);
-			const nextElement = form.elements[index + 1] as HTMLElement;
-
-			if (nextElement) {
-			nextElement.focus();
-			}
+			const nextElement = form?.elements[Array.from(form.elements).indexOf(e.currentTarget) + 1] as HTMLInputElement;
+			nextElement?.focus();
 		}
-		};
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		await window.electron.ipcRenderer.invoke('create-contact', newContact);
+		fetchContacts();
+		setNewContact({ firstName: '', lastName: '', email: '', phone: '', address1: '', address2: '', city: '', state: '', zipCode: '' });
+		setShowForm(false);
+	};
 	return (
 		<div>
 			<div className="w-full">
@@ -121,7 +131,7 @@ const ContactsForm = ({
 							className="w-3/12 border-2 shadow-md rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
 							/>
 					</div>
-					<div className='flex flex-row gap-2 y-2'>
+					<div className='flex flex-row gap-2 justify-end'>
 						<button onClick={() => setShowForm(false)} className="font-semibold text-lg bg-gray-600 text-white rounded-lg shadow-md px-6 py-2 h-min hover:bg-gray-700 transition">Cancel</button>
 						<button type="submit" className="font-semibold text-lg bg-green-600 text-white rounded-lg shadow-md px-6 py-2 h-min hover:bg-green-700 transition">Create</button>
 					</div>

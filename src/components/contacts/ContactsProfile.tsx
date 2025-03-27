@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
+import { FaEdit, FaTrash } from "react-icons/fa";
+import { ImExit } from "react-icons/im";
+
+
 const ContactsProfile = ({ 
   contact, 
   fetchContacts,
@@ -9,31 +13,16 @@ const ContactsProfile = ({
   fetchContacts: () => void,
   setSelectedContact: (contact: any) => void
 }) => {
-	const [contactDetails, setContactDetails] = useState<any | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
 
   const capitalizeFirstLetter = (text: string) => {
 		return text.charAt(0).toUpperCase() + text.slice(1);
 	};
   
-  const fetchContactDetails = async () => {
-    try {
-      const response = await window.electron.ipcRenderer.invoke('get-contact-details', { firstName: contact.FirstName, lastName: contact.LastName });
-      setContactDetails(response);
-    } catch (error) {
-      console.error('Error fetching contact details:', error);
-    }
-  };
-
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setContactDetails((prevDetails: any) => ({
-      ...prevDetails,
-      [name]: name === "FirstName" || name === "LastName" ? capitalizeFirstLetter(value) : value,
-    }));
+    contact[e.target.name] = e.target.name === "FirstName" || e.target.name === "LastName" ? capitalizeFirstLetter(e.target.value) : e.target.value;
     try {
-      await window.electron.ipcRenderer.invoke('update-contact', contactDetails);
-      fetchContacts();
+      await window.electron.ipcRenderer.invoke('update-contact', contact);
     } catch (error) {
       console.error('Error saving contact:', error);
     }
@@ -41,35 +30,28 @@ const ContactsProfile = ({
 
   const handleSave = async () => {
     try {
-      await window.electron.ipcRenderer.invoke('update-contact', contactDetails);
+      await window.electron.ipcRenderer.invoke('update-contact', contact);
       setIsEditing(false);
-      fetchContacts();
     } catch (error) {
       console.error('Error saving contact:', error);
     }
   };
 
   const handleDelete = async () => {
-    if (!contactDetails) return;
+    if (!contact) return;
     const confirmDelete = window.confirm("Are you sure you want to delete this contact?");
     if (!confirmDelete) return;
-
     try {
-      await window.electron.ipcRenderer.invoke('delete-contact', contactDetails.CustomerID);
-      setSelectedContact(null); // Clear the selected contact
-      fetchContacts(); // Refresh the contact list
+      await window.electron.ipcRenderer.invoke('delete-contact', contact.CustomerID);
+      setSelectedContact(null);
     } catch (error) {
       console.error('Error deleting contact:', error);
     }
   };
 
   useEffect(() => {
-    if (contact) {
-      fetchContactDetails();
-    }
+    fetchContacts();
   }, [contact]);
-
-  if (!contactDetails) return <div>Loading...</div>;
 
   return (
     <div className="bg-gray-50 p-4 border-2 rounded-lg shadow-md">
@@ -78,27 +60,36 @@ const ContactsProfile = ({
           <div className='flex flex-col gap-0'>
             <div className="flex flex-row justify-between">
               <div className='flex flex-row'>
-                <h2 className="text-2xl font-semibold mb-2 justify-end">{contactDetails.FirstName} {contactDetails.LastName}</h2>
+                <h2 className="text-2xl font-semibold mb-2 justify-end">{contact.FirstName} {contact.LastName}</h2>
                 {/* <button onClick={() => setIsEditing(true)} className="font-semibold text-lg text-black px-6 h- justify-center transition">Edit</button> */}
               </div>
-              {/* <button onClick={() => setSelectedContact(null)}  className="font-bold text-2xl text-black px-2 h-min justify-start hover:text-gray-400 transition">
-                &times;
-              </button> */}
+              <div className='flex flex-row gap-2 justify-between'>
+                <button 
+                className="font-semibold text-lg bg-green-600 text-white rounded-lg shadow-lg px-6 py-2 h-min hover:bg-green-100 transition" 
+                onClick={() => setIsEditing(true)} ><FaEdit /></button>
+                <button 
+                className="font-semibold text-lg bg-red-600 text-white rounded-lg shadow-lg px-6 py-2 h-min hover:bg-red-700 transition" 
+                onClick={handleDelete} ><FaTrash /></button>
+                <button 
+                className="font-semibold text-lg bg-gray-600 text-white rounded-lg shadow-lg px-6 py-2 h-min hover:bg-gray-700 transition"
+                onClick={() => setSelectedContact(null)} ><ImExit /></button>
+              </div>
+              
             </div>
-            {contactDetails.Email && <p className="text-xl text-gray-700"><strong>Email:</strong> {contactDetails.Email}</p>}
-            {contactDetails.Phone && <p className="text-xl text-gray-700"><strong>Phone:</strong> {contactDetails.Phone}</p>}
+            {contact.Email && <p className="text-xl text-gray-700"><strong>Email:</strong> {contact.Email}</p>}
+            {contact.Phone && <p className="text-xl text-gray-700"><strong>Phone:</strong> {contact.Phone}</p>}
             <p className="text-xl text-gray-700"><strong>Address:</strong></p>
-            <p className="text-xl text-gray-700">{contactDetails.Address1}</p>
-            <p className="text-xl text-gray-700">{contactDetails.Address2}</p>
-            <p className="text-xl text-gray-700">{contactDetails.City} {contactDetails.State} {contactDetails.ZipCode}</p>
+            <p className="text-xl text-gray-700">{contact.Address1}</p>
+            <p className="text-xl text-gray-700">{contact.Address2}</p>
+            <p className="text-xl text-gray-700">{contact.City} {contact.State} {contact.ZipCode}</p>
           </div>
-          <div className='flex flex-row gap-2 justify-between'>
+          {/* <div className='flex flex-row gap-2 justify-between'>
             <div className='flex flex-row gap-2'>
               <button className="font-semibold text-lg bg-green-600 text-white rounded-lg shadow-lg px-6 py-2 h-min hover:bg-green-700 transition" onClick={() => setIsEditing(true)} >Edit</button>
               <button className="font-semibold text-lg bg-red-600 text-white rounded-lg shadow-lg px-6 py-2 h-min hover:bg-red-700 transition" onClick={handleDelete}>Delete</button>
             </div>
             <button onClick={() => setSelectedContact(null)} className="font-semibold text-lg bg-gray-600 text-white rounded-lg shadow-lg px-6 py-2 h-min hover:bg-gray-700 transition">Close</button>
-          </div>
+          </div> */}
         </div>
       ) : (
         <div className="w-full m-auto flex flex-col gap-3">
@@ -107,7 +98,7 @@ const ContactsProfile = ({
               type="text"
               placeholder="First Name"
               name="FirstName"
-              value={contactDetails.FirstName}
+              value={contact.FirstName}
               onChange={handleInputChange}
               className="w-full border-2 shadow-sm rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
               required
@@ -116,7 +107,7 @@ const ContactsProfile = ({
               type="text"
               placeholder="Last Name"
               name="LastName"
-              value={contactDetails.LastName}
+              value={contact.LastName}
               onChange={handleInputChange}
               className="w-full border-2 shadow-sm rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
               required
@@ -126,7 +117,7 @@ const ContactsProfile = ({
             type="email"
             placeholder="Email"
             name="Email"
-            value={contactDetails.Email}
+            value={contact.Email}
             onChange={handleInputChange}
             className="border-2 shadow-sm rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
           />
@@ -134,7 +125,7 @@ const ContactsProfile = ({
             type="text"
             placeholder="Phone"
             name="Phone"
-            value={contactDetails.Phone}
+            value={contact.Phone}
             onChange={handleInputChange}
             className="border-2 shadow-sm rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
             pattern="^\d{10}$"
@@ -145,7 +136,7 @@ const ContactsProfile = ({
             type="text"
             placeholder="Address"
             name="Address1"
-            value={contactDetails.Address1}
+            value={contact.Address1}
             onChange={handleInputChange}
             className="border-2 shadow-sm rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
             required
@@ -154,7 +145,7 @@ const ContactsProfile = ({
             type="text"
             placeholder="Apartment, Suite, Etc"
             name="Address2"
-            value={contactDetails.Address2}
+            value={contact.Address2}
             onChange={handleInputChange}
             className="border-2 shadow-sm rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
           />
@@ -163,7 +154,7 @@ const ContactsProfile = ({
               type="text"
               placeholder="City"
               name="City"
-              value={contactDetails.City}
+              value={contact.City}
               onChange={handleInputChange}
               className="w-6/12 border-2 shadow-sm rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
@@ -171,7 +162,7 @@ const ContactsProfile = ({
               type="text"
               placeholder="State"
               name="State"
-              value={contactDetails.State}
+              value={contact.State}
               onChange={handleInputChange}
               className="w-3/12 border-2 shadow-sm rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
@@ -179,13 +170,12 @@ const ContactsProfile = ({
               type="text"
               placeholder="Zip Code"
               name="ZipCode"
-              value={contactDetails.ZipCode}
+              value={contact.ZipCode}
               onChange={handleInputChange}
               className="w-3/12 border-2 shadow-sm rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
             />
           </div>
-          <div className='flex flex-row gap-2'>
-            <button onClick={() => setIsEditing(false)} className="font-semibold text-lg bg-gray-600 text-white rounded-lg shadow-lg px-6 py-2 h-min hover:bg-gray-700 transition">Cancel</button>
+          <div className='flex flex-row gap-2 justify-end'>
             <button onClick={handleSave} className="font-semibold text-lg bg-green-600 text-white rounded-lg shadow-lg px-6 py-2 h-min hover:bg-green-700 transition">Save</button>
           </div>
         </div>
