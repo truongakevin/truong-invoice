@@ -47,7 +47,7 @@ const ContactsPage = () => {
             {selectedContact && (
               <div className="w-5/12 flex flex-col gap-8">
                 <ContactsProfile
-                  contact={selectedContact}
+                  selectedContact={selectedContact}
                   fetchContacts={fetchContacts}
                   setSelectedContact={setSelectedContact}
                 />
