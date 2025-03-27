@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import InvoicesForm from './InvoicesForm';
-import InvoicesList from './InvoicesList';
 import InvoicesSearchBar from './InvoicesSearchBar';
+import List from '../List';
 
 const InvoicesPage: React.FC = () => {
   const [invoices, setInvoices] = useState<any[]>([]);
   const [invoicesItems, setInvoicesItems] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<any[]>([]);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [showForm, setShowForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showForm, setShowForm] = useState(true);
 
+  const fetchCustomers = async () => {
+    const data = await window.electron.ipcRenderer.invoke('get-contacts');
+    setCustomers(data);
+  };
 
   const fetchInvoices = async () => {
     const data = await window.electron.ipcRenderer.invoke('get-invoices');
@@ -22,25 +27,42 @@ const InvoicesPage: React.FC = () => {
   };
 
   useEffect(() => {
+    fetchCustomers();
     fetchInvoices();
     fetchInvoicesItems();
   }, []);
 
+  // Combine invoices with customer data based on CustomerID
+  const invoicesWithCustomers = invoices.map(invoice => {
+    const customer = customers.find(c => c.CustomerID === invoice.CustomerID);
+    return {
+      ...invoice,
+      Customer: customer || {}
+    };
+  });
+
+  const filteredInvoicesWithCustomers = invoicesWithCustomers.filter((invoice) => {
+    return (
+      (invoice.Customer.FirstName && invoice.Customer.FirstName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (invoice.Customer.LastName && invoice.Customer.LastName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (invoice.Customer.Phone && invoice.Customer.Phone.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+  });
+
   return (
-    <div className='w-full'>
-      <div className='w-full flex flex-row gap-12 items-end pb-4'>
-        <div>
-          <h1 className="text-4xl font-semibold py-2">Invoices</h1>
-          <h2 className="text-gray-500 text-xl font-semibold">Manage and create Invoices for clients</h2>
+    <div className='flex flex-col text-xl'>
+      <div className='flex flex-row justify-between items-end font-semibold'>
+        <div className='flex flex-col gap-2'>
+          <h1 className="text-4xl">Invoices</h1>
+          <h2 className="text-gray-500">Manage and create Invoices for clients</h2>
         </div>
         {!showForm && (
-            <button
-              onClick={() => setShowForm(true)}
-              className="font-semibold text-lg bg-green-600 text-white rounded-lg shadow-lg px-6 py-2 h-min hover:bg-green-700 transition">New
-            </button>
-          )}
+          <button
+            onClick={() => setShowForm(true)}
+            className="h-min px-6 py-2 rounded-lg shadow-lg bg-green-600 hover:bg-green-700 transition text-white">New</button>
+        )}
       </div>
-      <div className='text-xl'>
+      <div className=''>
         {selectedInvoice && <p>InvoiceID: {selectedInvoice.InvoiceID}</p>}
         {selectedInvoice && <p>CustomerID: {selectedInvoice.CustomerID}</p>}
         {selectedInvoice && <p>InvoiceDate: {selectedInvoice.InvoiceDate}</p>}
@@ -54,33 +76,35 @@ const InvoicesPage: React.FC = () => {
       <div className='flex flex-col gap-4'>
         {/* {showForm && <InvoicesForm fetchInvoices={fetchInvoices} setShowForm={setShowForm} />} */}
         <InvoicesSearchBar query={searchQuery} setQuery={setSearchQuery}/>
-        <InvoicesList invoices={invoices} setSelectedInvoice={setSelectedInvoice} searchQuery={searchQuery} />
+        <List
+          fieldNames={['InvoiceID', 'Date', 'First Name', 'Last Name', 'Total', 'Due', 'Paid', 'Status']}
+          fieldValues={['InvoiceID', 'InvoiceDate', 'FirstName', 'LastName', 'TotalAmount', 'DueAmount', 'PaidAmount', 'Status']}
+          items={filteredInvoicesWithCustomers.map((invoice) => ({
+            InvoiceID: invoice.InvoiceID,
+            InvoiceDate: invoice.InvoiceDate,
+            FirstName: invoice.Customer.FirstName,
+            LastName: invoice.Customer.LastName,
+            TotalAmount: invoice.TotalAmount,
+            DueAmount: invoice.DueAmount,
+            PaidAmount: invoice.PaidAmount,
+            Status: invoice.Status,
+          }))}
+          setSelectedCell={setSelectedInvoice}
+        />
+        <List
+          fieldNames={['Invoice Item ID', 'Invoice ID', 'Service Date', 'Service Description', 'Quantity', 'Rate']}
+          fieldValues={['InvoiceItemID', 'InvoiceID', 'ServiceDate', 'ServiceDescription', 'Quantity', 'Rate']}
+          items={invoicesItems.map((invoiceItem) => ({
+            InvoiceItemID: invoiceItem.InvoiceItemID,
+            InvoiceID: invoiceItem.InvoiceID,
+            ServiceDate: invoiceItem.ServiceDate,
+            ServiceDescription: invoiceItem.ServiceDescription,
+            Quantity: invoiceItem.Quantity,
+            Rate: invoiceItem.Rate,
+          }))}
+        />
         <InvoicesForm fetchInvoices={fetchInvoices} fetchInvoicesItems={fetchInvoicesItems} setShowForm={setShowForm} />
       </div>
-      <table className="table-auto w-full mt-8">
-        <thead>
-          <tr>
-            <th className="border-2 px-4 py-2">InvoiceItemID</th>
-            <th className="border-2 px-4 py-2">InvoiceID</th>
-            <th className="border-2 px-4 py-2">ServiceDate</th>
-            <th className="border-2 px-4 py-2">ServiceDescription</th>
-            <th className="border-2 px-4 py-2">Quantity</th>
-            <th className="border-2 px-4 py-2">Rate</th>
-          </tr>
-        </thead>
-        <tbody>
-          {invoicesItems.map((invoiceItem) => (
-            <tr key={invoiceItem.InvoiceItemID}>
-              <td className="border-2 px-4 py-2">{invoiceItem.InvoiceItemID}</td>
-              <td className="border-2 px-4 py-2">{invoiceItem.InvoiceID}</td>
-              <td className="border-2 px-4 py-2">{invoiceItem.ServiceDate}</td>
-              <td className="border-2 px-4 py-2">{invoiceItem.ServiceDescription}</td>
-              <td className="border-2 px-4 py-2">{invoiceItem.Quantity}</td>
-              <td className="border-2 px-4 py-2">{invoiceItem.Rate}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 };

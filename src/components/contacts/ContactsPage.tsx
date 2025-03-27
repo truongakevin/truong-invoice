@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import ContactsList from './ContactsList';
 import ContactsForm from './ContactsForm';
 import ContactsSearchBar from './ContactsSearchBar';
 import ContactsProfile from './ContactsProfile';
+import List from '../List';
 
 const ContactsPage = () => {
   const [contacts, setContacts] = useState<any[]>([]);
@@ -47,11 +47,11 @@ const ContactsPage = () => {
   });
 
   return (
-    <div className="">
-      <div className="flex flex-row gap-12 items-end pb-4">
-        <div>
-          <h1 className="text-4xl font-semibold py-2">Contacts</h1>
-          <h2 className="text-gray-500 text-xl font-semibold">Manage and create contacts for clients</h2>
+    <div className='flex flex-col text-xl'>
+      <div className='flex flex-row justify-between items-end font-semibold'>
+        <div className='flex flex-col gap-2'>
+          <h2 className="text-4xl">Contacts</h2>
+          <h2 className="text-gray-500">Manage and create contacts for clients</h2>
         </div>
         {!showForm && (
           <button
@@ -63,20 +63,43 @@ const ContactsPage = () => {
 
       {showForm && (
         <div className="fixed inset-0 flex justify-center items-center z-20">
-			<div className="absolute inset-0 bg-black opacity-30 z-10"></div>
+          <div className="absolute inset-0 bg-black opacity-10 z-10"></div>
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg mt-10 z-20">
-            <ContactsForm handleSubmit={handleSubmit} newContact={newContact} setNewContact={setNewContact} setShowForm={setShowForm} />
+            <ContactsForm 
+              handleSubmit={handleSubmit} 
+              newContact={newContact} 
+              setNewContact={setNewContact} 
+              setShowForm={setShowForm} 
+            />
           </div>
         </div>
       )}
 
       <div className="w-full flex flex-col gap-8">
-        <div className="w-full flex flex-row gap-4">
-			<div className="w-4/12 flex flex-col gap-4">
-				<ContactsSearchBar query={searchQuery} setQuery={setSearchQuery} />
-				{selectedContact && <ContactsProfile contact={selectedContact} fetchContacts={fetchContacts} setSelectedContact={setSelectedContact} />}
-			</div>
-			<ContactsList contacts={filteredContacts} setSelectedContact={setSelectedContact} />
+        <div className="w-full flex flex-row gap-8">
+          <div className="w-full flex flex-col gap-8">
+            <ContactsSearchBar 
+              query={searchQuery} 
+              setQuery={setSearchQuery} 
+            />
+              
+            <List
+              fieldNames={['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Address', 'City']}
+              fieldValues={['CustomerID', 'FirstName', 'LastName', 'Email', 'Phone', 'Address1', 'City']}
+              items={filteredContacts.map((contact) => ({CustomerID: contact.CustomerID, FirstName: contact.FirstName, LastName: contact.LastName, Email: contact.Email, Phone: contact.Phone, Address1: contact.Address1, City: contact.City}))}
+              setSelectedCell={setSelectedContact}
+            />
+          </div>
+
+          {selectedContact && (
+            <div className="w-full flex flex-col gap-8">
+              <ContactsProfile 
+                contact={selectedContact} 
+                fetchContacts={fetchContacts} 
+                setSelectedContact={setSelectedContact} 
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
