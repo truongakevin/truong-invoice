@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ContactsForm from './ContactsForm';
-import ContactsSearchBar from './ContactsSearchBar';
 import ContactsProfile from './ContactsProfile';
 import List from '../List';
+import SearchBar from '../SearchBar';
 
 const ContactsPage = () => {
   const [contacts, setContacts] = useState<any[]>([]);
@@ -78,7 +78,7 @@ const ContactsPage = () => {
       <div className="w-full flex flex-col gap-8">
         <div className="w-full flex flex-row gap-8">
           <div className="w-full flex flex-col gap-8">
-            <ContactsSearchBar 
+            <SearchBar 
               query={searchQuery} 
               setQuery={setSearchQuery} 
             />

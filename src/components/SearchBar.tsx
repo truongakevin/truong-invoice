@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ContactsSearchBar = ({ query, setQuery }: { query: string, setQuery: React.Dispatch<React.SetStateAction<string>> }) => {
+const SearchBar = ({ query, setQuery }: { query: string, setQuery: React.Dispatch<React.SetStateAction<string>> }) => {
   return (
     <div className="w-full">
       <h2 className="text-3xl font-semibold py-2">
@@ -17,4 +17,4 @@ const ContactsSearchBar = ({ query, setQuery }: { query: string, setQuery: React
   );
 };
 
-export default ContactsSearchBar;
+export default SearchBar;

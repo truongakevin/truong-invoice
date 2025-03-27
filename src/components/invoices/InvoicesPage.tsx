@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import InvoicesForm from './InvoicesForm';
-import InvoicesSearchBar from './InvoicesSearchBar';
 import List from '../List';
+import SearchBar from '../SearchBar';
 
 const InvoicesPage: React.FC = () => {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -75,7 +75,10 @@ const InvoicesPage: React.FC = () => {
         
       <div className='flex flex-col gap-4'>
         {/* {showForm && <InvoicesForm fetchInvoices={fetchInvoices} setShowForm={setShowForm} />} */}
-        <InvoicesSearchBar query={searchQuery} setQuery={setSearchQuery}/>
+        <SearchBar 
+          query={searchQuery} 
+          setQuery={setSearchQuery}
+        />
         <List
           fieldNames={['InvoiceID', 'Date', 'First Name', 'Last Name', 'Total', 'Due', 'Paid', 'Status']}
           fieldValues={['InvoiceID', 'InvoiceDate', 'FirstName', 'LastName', 'TotalAmount', 'DueAmount', 'PaidAmount', 'Status']}
