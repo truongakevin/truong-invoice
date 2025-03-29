@@ -15,11 +15,11 @@ const ContactsPage = () => {
 
   useEffect(() => {
     fetchContacts();
-    console.log(selectedContact)
   }, []);
 
   const filteredContacts = contacts.filter(contact => {
-    return (contact.FirstName == null ? console.log(contact) :
+    // return (contact.FirstName == null ? console.log(contact) :
+    return (
       contact.FirstName.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
       contact.LastName.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
       contact.Phone.toLowerCase().startsWith(searchQuery.toLowerCase())
