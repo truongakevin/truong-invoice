@@ -15,8 +15,8 @@ const ContactsPage = () => {
 
   useEffect(() => {
     fetchContacts();
-    console.log("selected contact",selectedContact);
-  }, [selectedContact]);
+    console.log(selectedContact)
+  }, []);
 
   const filteredContacts = contacts.filter(contact => {
     return (contact.FirstName == null ? console.log(contact) :
@@ -27,16 +27,7 @@ const ContactsPage = () => {
   });
 
   const handleNew = async () => {
-    const result = await window.electron.ipcRenderer.invoke('create-contact', {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      address1: '',
-      address2: '',
-      city: '',
-      state: '',
-      zipCode: '',
+    const result = await window.electron.ipcRenderer.invoke('create-contact', {firstName: '',lastName: '',email: '',phone: '',address1: '',address2: '',city: '',state: '',zipCode: '',
     });
     setSelectedContact({
       ContactID: result.ContactID,
@@ -51,19 +42,6 @@ const ContactsPage = () => {
       ZipCode: '',
     });
     fetchContacts();
-    console.log({
-      ContactID: result.ContactID,
-      FirstName: '',
-      LastName: '',
-      Email: '',
-      Phone: '',
-      Address1: '',
-      Address2: '',
-      City: '',
-      State: '',
-      ZipCode: '',
-    });
-    console.log(selectedContact)
   };
 
   const handleDelete = async () => {
@@ -80,38 +58,41 @@ const ContactsPage = () => {
 
 
   return (
-    <div className="h-full flex flex-row gap-4">
-      <div className="flex flex-col gap-4">
-          <SearchBar query={searchQuery} setQuery={setSearchQuery} />
-          <div className='flex flex-row gap-4'>
-            <button 
-              onClick={() => handleNew()}
-              className='rounded-lg shadow-lg px-6 p-1 font-bold bg-green-600 hover:bg-green-700 text-white'>
-                New
-            </button>
-            <button 
-              onClick={() => handleDelete()}
-              className='rounded-lg shadow-lg px-6 p-1 font-bold bg-red-600 hover:bg-red-700 text-white'>
-                Delete
-            </button>
-          </div>
-          <List
-            fieldNames={['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Address', 'City']} 
-            fieldValues={['ContactID', 'FirstName', 'LastName', 'Email', 'Phone', 'Address1', 'City']} 
-            items={filteredContacts} 
-            selectedCell={selectedContact} 
-            setSelectedCell={setSelectedContact} 
-          />
+    <div className="h-full w-full flex flex-row gap-4">
+      <div className="w-full flex flex-col gap-4">
+        <SearchBar 
+          searchQuery={searchQuery} 
+          setSearchQuery={setSearchQuery} 
+        />
+        <div className='flex flex-row gap-4'>
+          <button 
+            onClick={() => handleNew()}
+            className='rounded-lg shadow-lg px-6 p-1 font-bold bg-green-600 hover:bg-green-700 text-white'>
+              New
+          </button>
+          <button 
+            onClick={() => handleDelete()}
+            className='rounded-lg shadow-lg px-6 p-1 font-bold bg-red-600 hover:bg-red-700 text-white'>
+              Delete
+          </button>
         </div>
-        <div className="bg-neutral-100 p-4">
-          <Contact 
-            fetchContacts={fetchContacts}
-            contacts={contacts}
-            selectedContact={selectedContact}
-            setSelectedContact={setSelectedContact}
-          />
-        </div>
+        <List
+          fieldNames={['ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Address', 'City']} 
+          fieldValues={['ContactID', 'FirstName', 'LastName', 'Email', 'Phone', 'Address1', 'City']} 
+          items={filteredContacts} 
+          selectedCell={selectedContact} 
+          setSelectedCell={setSelectedContact} 
+        />
       </div>
+      <div className="w-full bg-neutral-100 p-4">
+        <Contact 
+          fetchContacts={fetchContacts}
+          contacts={contacts}
+          selectedContact={selectedContact}
+          setSelectedContact={setSelectedContact}
+        />
+      </div>
+    </div>
   );
 };
 
