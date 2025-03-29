@@ -1,26 +1,5 @@
 import React, { useEffect, useState } from 'react';
 
-// Sort function for sorting the table rows based on selected field and order
-const sortData = (data: any[], sortKey: string, order: string) => {
-  return [...data].sort((a, b) => { // Create a new sorted array
-    let aValue = a;
-    let bValue = b;
-
-    // If the sortKey is related to a nested Contact field, extract the value
-    if (sortKey.includes("Contact.")) {
-      const field = sortKey.split('.')[1]; // Extract 'FirstName' or 'LastName'
-      aValue = a.Contact ? a.Contact[field] : '';
-      bValue = b.Contact ? b.Contact[field] : '';
-    } else {
-      aValue = a[sortKey];
-      bValue = b[sortKey];
-    }
-
-    if (aValue < bValue) return order === 'asc' ? -1 : 1;
-    if (aValue > bValue) return order === 'asc' ? 1 : -1;
-    return 0;
-  });
-};
 const List = ({
   fieldNames,
   fieldValues,
@@ -40,6 +19,27 @@ const List = ({
   useEffect(() => {
   }, []);
 
+  // Sort function for sorting the table rows based on selected field and order
+  const sortData = (data: any[], sortKey: string, order: string) => {
+    return [...data].sort((a, b) => { // Create a new sorted array
+      let aValue = a;
+      let bValue = b;
+
+      // If the sortKey is related to a nested Contact field, extract the value
+      if (sortKey.includes("Contact.")) {
+        const field = sortKey.split('.')[1];
+        aValue = a.Contact ? a.Contact[field] : '';
+        bValue = b.Contact ? b.Contact[field] : '';
+      } else {
+        aValue = a[sortKey];
+        bValue = b[sortKey];
+      }
+
+      if (aValue < bValue) return order === 'asc' ? -1 : 1;
+      if (aValue > bValue) return order === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
   // Handle sorting when a header is clicked
   const handleSort = (key: string) => {
     const newOrder = sortKey === key && sortOrder === 'asc' ? 'desc' : 'asc';
@@ -75,7 +75,7 @@ const List = ({
               {fieldValues.map((key, idx) => (
                 <td
                   key={idx}
-                  className={`px-2 py-1 ${item == selectedCell && 'bg-neutral-300'} ${fieldValues[idx].includes("Amount") && 'text-right'}`}
+                  className={`px-2 py-1 ${item && selectedCell && item[fieldValues[0]] == selectedCell[fieldValues[0]] && 'bg-neutral-300'} ${fieldValues[idx].includes("Amount") && 'text-right'}`}
                 >
                   {fieldValues[idx].includes("Amount") && '$'}
                   {key.includes("Contact.") 

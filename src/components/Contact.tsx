@@ -48,10 +48,11 @@ const Contact = ({
       State: contact.State,
       ZipCode: contact.ZipCode,
     }));
+    setIsDropdownVisible(false);
   };
 
   const handleInputChange = (key: keyof typeof selectedContact, value: string) => {
-    if (key === "FirstName" || key === "LastName") {
+    if (value != selectedContact[key] && (key === "FirstName" || key === "LastName")) {
       setIsDropdownVisible(true);
       fetchFilteredContacts(key, value);
       value = capitalizeFirstLetter(value);
@@ -66,10 +67,9 @@ const Contact = ({
 
   return (
     <div className="w-full h-full flex flex-col gap-2">
-      <div className='flex flex-row text-lg justify-between'>
-        <h2 className="font-bold">Billing Address</h2>
-        {/* <FaRegTrashAlt className='text-lg' /> */}
-
+      <div className='flex flex-rov justify-between'>
+        <h2 className="font-bold text-lg">Billing Address</h2>
+        <h2 className="font-bold text-lg">{selectedContact.ContactID}</h2>
       </div>
       <div className="flex flex-row gap-2">
         {[

@@ -29,7 +29,7 @@ const Hub: React.FC = () => {
 
       {/* Tab Content - Takes Up Remaining Space */}
       <div className="flex-1 overflow-hidden">
-        <div className="h-full p-4">
+        <div className="w-full h-full p-4">
           {activeTab === 'Invoices' && <InvoicesPage />}
           {activeTab === 'Contacts' && <ContactsPage />}
         </div>
