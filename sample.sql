@@ -1,5 +1,5 @@
 -- Insert Sample Contacts
-INSERT INTO Customers (FirstName, LastName, Email, Phone, Address1, City, State, ZipCode) VALUES 
+INSERT INTO Contacts (FirstName, LastName, Email, Phone, Address1, City, State, ZipCode) VALUES 
 ('Kevin', 'Truong', 'thekevoness@gmail.com', '7202246183', '11708 Montgomery Circle', 'Longmont', 'CO', '80504'),
 ('John', 'Doe', 'john.doe@example.com', '3031234567', '123 Main St', 'Denver', 'CO', '80202'),
 ('Jane', 'Smith', 'jane.smith@example.com', '7202345678', '456 Elm St', 'Boulder', 'CO', '80301'),
@@ -40,7 +40,7 @@ INSERT INTO Customers (FirstName, LastName, Email, Phone, Address1, City, State,
 ('Hudson', 'Edwards', 'hudson.edwards@example.com', '3037890123', '2525 Cedar St', 'Telluride', 'CO', '81435');
 
 -- Insert sample invoices
-INSERT INTO Invoices (CustomerID, InvoiceDate, DueDate, TotalAmount, PaidAmount, DueAmount, Status) VALUES
+INSERT INTO Invoices (ContactID, InvoiceDate, DueDate, TotalAmount, PaidAmount, DueAmount, Status) VALUES
 (1, '2025-03-01', '2025-03-15', 500.00, 250.00, 250.00, 'Pending'),
 (2, '2025-03-05', '2025-03-20', 350.00, 0.00, 350.00, 'Pending'),
 (3, '2025-03-10', '2025-03-25', 1000.00, 500.00, 500.00, 'Paid'),
@@ -52,8 +52,8 @@ INSERT INTO Invoices (CustomerID, InvoiceDate, DueDate, TotalAmount, PaidAmount,
 (9, '2025-03-25', '2025-04-09', 700.00, 700.00, 0.00, 'Paid'),
 (10, '2025-03-28', '2025-04-12', 900.00, 0.00, 900.00, 'Pending');
 
--- Insert sample invoice items
-INSERT INTO InvoiceItems (InvoiceID, ServiceDescription, ServiceDate, Quantity, Rate) VALUES
+-- Insert sample services
+INSERT INTO Services (InvoiceID, ServiceDescription, ServiceDate, Quantity, Rate) VALUES
 (1, 'Web Development', '2025-03-01', 10, 50.00),
 (1, 'SEO Optimization', '2025-03-02', 5, 30.00),
 (2, 'Consulting Services', '2025-03-05', 7, 45.00),
