@@ -13,7 +13,7 @@ const ContactsProfile = ({
   fetchContacts: () => void,
   setSelectedContact: (selectedContact: any) => void
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
 
   const capitalizeFirstLetter = (text: string) => {
 		return text.charAt(0).toUpperCase() + text.slice(1);
@@ -42,7 +42,7 @@ const ContactsProfile = ({
     const confirmDelete = window.confirm("Are you sure you want to delete this contact?");
     if (!confirmDelete) return;
     try {
-      await window.electron.ipcRenderer.invoke('delete-contact', selectedContact.CustomerID);
+      await window.electron.ipcRenderer.invoke('delete-contact', selectedContact.ContactID);
       setSelectedContact(null);
     } catch (error) {
       console.error('Error deleting contact:', error);
@@ -59,9 +59,19 @@ const ContactsProfile = ({
         <div className='w-full m-auto flex flex-col gap-4'>
           <div className='flex flex-col'>
             <div className="flex flex-row justify-between">
-              <div className='flex flex-row gap-4'>
-                <h2 className="text-2xl justify-end font-semibold">{selectedContact.FirstName} {selectedContact.LastName}</h2>
+              <div className='flex flex-row gap-4 items-center font-semibold'>
+                <h2 className="text-2xl">{selectedContact.FirstName} {selectedContact.LastName}</h2>
                 <button 
+                className="h-min text-lg text-neutral-700 hover:text-neutral-500 transition" 
+                onClick={() => setIsEditing(true)} > Edit </button>
+                <button 
+                className="h-min text-lg text-neutral-700 hover:text-neutral-500 transition" 
+                onClick={handleDelete} > Delete </button>
+              </div>
+              <button 
+              className="text-xl text-black hover:text-neutral-500 transition"
+              onClick={() => setSelectedContact(null)} ><FaRegWindowClose /></button>
+                {/* <button 
                 className="text-xl text-black hover:text-neutral-500 transition" 
                 onClick={() => setIsEditing(true)} ><FaEdit /></button>
                 <button 
@@ -70,7 +80,7 @@ const ContactsProfile = ({
               </div>
               <button 
               className="text-xl text-black hover:text-neutral-500 transition"
-              onClick={() => setSelectedContact(null)} ><FaRegWindowClose /></button>
+              onClick={() => setSelectedContact(null)} ><FaRegWindowClose /></button> */}
             </div>
             {selectedContact.Email && <p className="text-xl text-gray-700"><strong>Email:</strong> {selectedContact.Email}</p>}
             {selectedContact.Phone && <p className="text-xl text-gray-700"><strong>Phone:</strong> {selectedContact.Phone}</p>}
