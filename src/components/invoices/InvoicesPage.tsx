@@ -1,112 +1,129 @@
-import React, { useEffect, useState } from 'react';
-import InvoicesForm from './InvoicesForm';
+import React, { useEffect } from 'react';
+import InvoiceForm from './InvoiceForm';
 import List from '../List';
 import SearchBar from '../SearchBar';
+import { Contact, Invoice, Service } from '../../types';
 
-const InvoicesPage: React.FC = () => {
-  const [invoices, setInvoices] = useState<any[]>([]);
-  const [invoicesItems, setInvoicesItems] = useState<any[]>([]);
-  const [customers, setCustomers] = useState<any[]>([]);
-  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
-  const [showForm, setShowForm] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const fetchCustomers = async () => {
-    const data = await window.electron.ipcRenderer.invoke('get-contacts');
-    setCustomers(data);
-  };
-
-  const fetchInvoices = async () => {
-    const data = await window.electron.ipcRenderer.invoke('get-invoices');
-    setInvoices(data);
-  };
-
-  const fetchInvoicesItems = async () => {
-    const data = await window.electron.ipcRenderer.invoke('get-invoice-items');
-    setInvoicesItems(data);
-  };
-
+const InvoicesPage = ({
+  contacts,
+  fetchContacts,
+  invoices,
+  fetchInvoices,
+  filteredInvoicesWithContacts,
+  services,
+  fetchServices,
+  selectedContact,
+  setSelectedContact,
+  selectedInvoice,
+  setSelectedInvoice,
+  searchQuery,
+  setSearchQuery,
+  invoiceServices,
+  setInvoiceServices,
+  handleSave,
+} : {
+  contacts: Contact[];
+	fetchContacts: () => void;
+  invoices: Invoice[];
+	fetchInvoices: () => void;
+  filteredInvoicesWithContacts: Invoice[];
+  services: Service[];
+	fetchServices: () => void;
+  selectedContact: Contact | null;
+  setSelectedContact?: (selectedContact: Contact | null) => void;
+  selectedInvoice: Invoice | null; 
+  setSelectedInvoice: (selectedInvoice: Invoice | null) => void;
+  invoiceServices: Service[] | null;
+  setInvoiceServices: (invoiceServices: Service[] | null) => void;
+  searchQuery: string; 
+  setSearchQuery: (searchQuery: string) => void;
+	handleSave: () => void;
+}) => {
+  
   useEffect(() => {
-    fetchCustomers();
+    if (selectedInvoice?.InvoiceID && selectedInvoice?.ContactID) {
+      setSelectedContact(contacts.find(contact => contact.ContactID === selectedInvoice?.ContactID))
+    }
+    if (!selectedInvoice?.InvoiceDate) {
+      setSelectedInvoice({
+        ...selectedInvoice,
+        InvoiceDate: new Date().toISOString().split('T')[0],
+      });
+    }
     fetchInvoices();
-    fetchInvoicesItems();
-  }, []);
+  }, [selectedInvoice]);
 
-  // Combine invoices with customer data based on CustomerID
-  const invoicesWithCustomers = invoices.map(invoice => {
-    const customer = customers.find(c => c.CustomerID === invoice.CustomerID);
-    return {
-      ...invoice,
-      Customer: customer || {}
-    };
-  });
 
-  const filteredInvoicesWithCustomers = invoicesWithCustomers.filter((invoice) => {
-    return (
-      (invoice.Customer.FirstName && invoice.Customer.FirstName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (invoice.Customer.LastName && invoice.Customer.LastName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (invoice.Customer.Phone && invoice.Customer.Phone.toLowerCase().includes(searchQuery.toLowerCase()))
-    );
-  });
+  const handleNew = async () => {
+    // const contact = await window.electron.ipcRenderer.invoke('create-contact', {FirstName: '',LastName: '',Email: '',Phone: '',Address1: '',Address2: '',City: '',State: '',ZipCode: '',});
+    setSelectedContact({ContactID: null, FirstName: '', LastName: '', Email: '', Phone: '', Address1: '', Address2: '', City: '', State: '', ZipCode: ''});
+    fetchContacts();
+    
+    // const invoice = await window.electron.ipcRenderer.invoke('create-invoice', {ContactID: contact.ContactID, InvoiceDate: '', DueDate: '', TotalAmount: 0, PaidAmount: 0, DueAmount: 0, Status: '',});
+    setSelectedInvoice({InvoiceID: null, ContactID: null, InvoiceDate: '', DueDate: '', TotalAmount: 0, PaidAmount: 0, DueAmount: 0, Status: ''});
+    fetchInvoices();
+  };
+
+  const handleDelete = async () => {
+    if (!selectedContact) return;
+    if (!window.confirm("Are you sure you want to delete this contact?")) return;
+    try {
+      await window.electron.ipcRenderer.invoke('delete-invoice', selectedInvoice.InvoiceID);
+      fetchInvoices();
+      setSelectedInvoice(null);
+    } catch (error) {
+      console.error('Error deleting invoice:', error);
+    }
+  };
 
   return (
-    <div className='flex flex-col text-xl'>
-      <div className='flex flex-row justify-between items-end font-semibold'>
-        <div className='flex flex-col gap-2'>
-          <h1 className="text-4xl">Invoices</h1>
-          <h2 className="text-gray-500">Manage and create Invoices for clients</h2>
-        </div>
-        {!showForm && (
-          <button
-            onClick={() => setShowForm(true)}
-            className="h-min px-6 py-2 rounded-lg shadow-lg bg-green-600 hover:bg-green-700 transition text-white">New</button>
-        )}
-      </div>
-      <div className=''>
-        {selectedInvoice && <p>InvoiceID: {selectedInvoice.InvoiceID}</p>}
-        {selectedInvoice && <p>CustomerID: {selectedInvoice.CustomerID}</p>}
-        {selectedInvoice && <p>InvoiceDate: {selectedInvoice.InvoiceDate}</p>}
-        {selectedInvoice && <p>DueDate: {selectedInvoice.DueDate}</p>}
-        {selectedInvoice && <p>TotalAmount: {selectedInvoice.TotalAmount}</p>}
-        {selectedInvoice && <p>PaidAmount: {selectedInvoice.PaidAmount}</p>}
-        {selectedInvoice && <p>DueAmount: {selectedInvoice.DueAmount}</p>}
-        {selectedInvoice && <p>Status: {selectedInvoice.Status}</p>}
-      </div>
-        
-      <div className='flex flex-col gap-4'>
-        {/* {showForm && <InvoicesForm fetchInvoices={fetchInvoices} setShowForm={setShowForm} />} */}
+    <div className="w-full h-full flex flex-row gap-4">
+      <div className="w-full flex flex-col gap-4">
         <SearchBar 
-          query={searchQuery} 
-          setQuery={setSearchQuery}
+          searchQuery={searchQuery} 
+          setSearchQuery={setSearchQuery} 
         />
+        <div className='flex flex-row gap-4'>
+          <button 
+            onClick={() => handleNew()}
+            className='rounded-lg shadow-lg px-6 p-1 font-bold bg-green-600 hover:bg-green-700 text-white'>
+              New
+          </button>
+          <button 
+            onClick={() => handleDelete()}
+            className='rounded-lg shadow-lg px-6 p-1 font-bold bg-red-600 hover:bg-red-700 text-white'>
+              Delete
+          </button>
+        </div>
         <List
           fieldNames={['InvoiceID', 'Date', 'First Name', 'Last Name', 'Total', 'Due', 'Paid', 'Status']}
-          fieldValues={['InvoiceID', 'InvoiceDate', 'FirstName', 'LastName', 'TotalAmount', 'DueAmount', 'PaidAmount', 'Status']}
-          items={filteredInvoicesWithCustomers.map((invoice) => ({
-            InvoiceID: invoice.InvoiceID,
-            InvoiceDate: invoice.InvoiceDate,
-            FirstName: invoice.Customer.FirstName,
-            LastName: invoice.Customer.LastName,
-            TotalAmount: invoice.TotalAmount,
-            DueAmount: invoice.DueAmount,
-            PaidAmount: invoice.PaidAmount,
-            Status: invoice.Status,
-          }))}
+          fieldValues={['InvoiceID', 'InvoiceDate', 'Contact.FirstName', 'Contact.LastName', 'TotalAmount', 'DueAmount', 'PaidAmount', 'Status']}
+          items={filteredInvoicesWithContacts}
+          selectedCell={selectedInvoice}
           setSelectedCell={setSelectedInvoice}
         />
         <List
-          fieldNames={['Invoice Item ID', 'Invoice ID', 'Service Date', 'Service Description', 'Quantity', 'Rate']}
-          fieldValues={['InvoiceItemID', 'InvoiceID', 'ServiceDate', 'ServiceDescription', 'Quantity', 'Rate']}
-          items={invoicesItems.map((invoiceItem) => ({
-            InvoiceItemID: invoiceItem.InvoiceItemID,
-            InvoiceID: invoiceItem.InvoiceID,
-            ServiceDate: invoiceItem.ServiceDate,
-            ServiceDescription: invoiceItem.ServiceDescription,
-            Quantity: invoiceItem.Quantity,
-            Rate: invoiceItem.Rate,
-          }))}
+          fieldNames={['Service ID', 'Invoice ID', 'Service Date', 'Service Description', 'Quantity', 'Rate']}
+          fieldValues={['ServiceID', 'InvoiceID', 'ServiceDate', 'ServiceDescription', 'Quantity', 'Rate']}
+          items={services}
         />
-        <InvoicesForm fetchInvoices={fetchInvoices} fetchInvoicesItems={fetchInvoicesItems} setShowForm={setShowForm} />
+      </div>
+      <div className="w-full h-full bg-neutral-100 p-4">
+        <InvoiceForm 
+          contacts={contacts}
+          fetchContacts={fetchContacts}
+          invoices={invoices}
+          fetchInvoices={fetchInvoices}
+          services={services}
+          fetchServices={fetchServices}
+          selectedContact={selectedContact}
+          setSelectedContact={setSelectedContact}
+          selectedInvoice={selectedInvoice}
+          setSelectedInvoice={setSelectedInvoice}
+          invoiceServices={invoiceServices}
+          setInvoiceServices={setInvoiceServices}
+          handleSave={handleSave}
+        />
       </div>
     </div>
   );
