@@ -1,42 +1,39 @@
 import React, { useEffect, useState } from 'react';
+import { Contact } from '../types';
 
+interface ContactFormProps {
+  contacts: Contact[];
+  selectedContact: Contact | null;
+  setSelectedContact?: (selectedContact: Contact | null) => void;
+  handleSave: () => void;
+}
 
-const Contact = ({
-  fetchContacts,
+const ContactForm: React.FC<ContactFormProps> = ({
   contacts,
   selectedContact,
   setSelectedContact,
-  // setNewInvoice,
-} : { 
-	fetchContacts: () => void;
-  contacts: any;
-  selectedContact: any,
-  setSelectedContact?: (selectedContact: any) => void
-  // setNewInvoice?:  React.Dispatch<React.SetStateAction<any>>;
+  handleSave,
 }) => {
-  const [filteredContacts, setFilteredContacts] = useState<any[]>([]);
+  const [filteredDropdownContacts, setFilteredDropdownContacts] = useState<Contact[]>([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
-  const [activeField, setActiveField] = useState<any>(null);
+  const [activeField, setActiveField] = useState<keyof Contact | null>(null);
 
   const capitalizeFirstLetter = (text: string) => text ? text.charAt(0).toUpperCase() + text.slice(1) : '';
 
-  const fetchFilteredContacts = async (key: string, query: string) => {
-    setFilteredContacts(contacts.filter((contact: any) =>
-      contact[key].toLowerCase().startsWith(query.toLowerCase())
+  const fetchFilteredDropdownContacts = async (key: keyof Contact, query: string) => {
+    setFilteredDropdownContacts(contacts.filter((contact: Contact) =>
+      (contact[key] as string).toLowerCase().startsWith(query.toLowerCase())
     ));
   };
 
+  // useEffect(() => {
+  //   console.log((selectedContact?.ContactID == null) , isDropdownVisible , filteredDropdownContacts.length > 0 , activeField )
+  // }, [selectedContact]);
   useEffect(() => {
-  }, [selectedContact]);
+  }, []);
 
-  const handleContactSelect = (contact: any) => {
-    setIsDropdownVisible(false);
-    // setNewInvoice && setNewInvoice((prev) => ({
-    //   ...prev,
-    //   contactID: contact.ContactID,
-    // }));
-    setSelectedContact((prev) => ({
-      ...prev,
+  const handleContactSelect = (contact: Contact) => {
+    setSelectedContact({
       ContactID: contact.ContactID,
       FirstName: contact.FirstName,
       LastName: contact.LastName,
@@ -47,48 +44,43 @@ const Contact = ({
       City: contact.City,
       State: contact.State,
       ZipCode: contact.ZipCode,
-    }));
+    });
     setIsDropdownVisible(false);
   };
 
-  const handleInputChange = (key: keyof typeof selectedContact, value: string) => {
-    if (value != selectedContact[key] && (key === "FirstName" || key === "LastName")) {
+  const handleInputChange = (key: keyof Contact, value: string) => {
+    if (value != selectedContact?.[key] && (key === "FirstName" || key === "LastName")) {
       setIsDropdownVisible(true);
-      fetchFilteredContacts(key, value);
+      fetchFilteredDropdownContacts(key, value);
       value = capitalizeFirstLetter(value);
     }
     setSelectedContact({...selectedContact, [key]: value});
   };
 
-  const handleSave = async () => {
-    await window.electron.ipcRenderer.invoke('update-contact', selectedContact);
-    fetchContacts();
-  }
-
   return (
-    <div className="w-full h-full flex flex-col gap-2">
+    <div className="w-full flex flex-col gap-2">
       <div className='flex flex-rov justify-between'>
         <h2 className="font-bold text-lg">Billing Address</h2>
-        <h2 className="font-bold text-lg">{selectedContact.ContactID}</h2>
+        <h2 className="font-bold text-lg">{selectedContact?.ContactID}</h2>
       </div>
       <div className="flex flex-row gap-2">
         {[
-          { key: 'FirstName', type: 'text', placeholder: 'First Name', required: true },
-          { key: 'LastName', type: 'text', placeholder: 'Last Name', required: true },
+          { key: 'FirstName', type: 'text', placeholder: 'First Name' },
+          { key: 'LastName', type: 'text', placeholder: 'Last Name' },
         ].map(({ key, ...props }) => (
           <div key={key} className="relative w-full">
             <input
             key={key}
-            value={selectedContact[key] || ''}
-            onFocus={() => setActiveField(key)}
-            onBlur={() => handleSave()}
-            onChange={(e) => handleInputChange(key, e.target.value)}
-            className="w-full placeholder-gray-500 border-0 rounded px-2 py-1 focus:outline-none bg-yellow-50 focus:bg-yellow-100"
+            value={selectedContact?.[key as keyof Contact] || ''}
+            onFocus={() => setActiveField(key as keyof Contact)}
+            onBlur={() => {setIsDropdownVisible(false); handleSave()}}
+            onChange={(e) => handleInputChange(key as keyof Contact, e.target.value)}
+            className={`w-full placeholder-gray-500 border-0 rounded px-2 py-1 focus:outline-none bg-yellow-50 focus:bg-yellow-100`}
             {...props}
             />
-            {isDropdownVisible && filteredContacts.length > 0 && activeField === key && (
-              <div className="absolute bg-white shadow-xl w-full rounded">
-                {filteredContacts.map((contact, idx) => (
+            {(selectedContact?.ContactID == null) && isDropdownVisible && filteredDropdownContacts.length > 0 && activeField === key && (
+              <div className="absolute bg-white shadow-xl w-full rounded" onMouseDown={(e) => e.preventDefault()}>
+                {filteredDropdownContacts.map((contact, idx) => (
                   <div
                     key={idx}
                     className="px-3 py-2 cursor-pointer hover:bg-gray-200"
@@ -104,12 +96,12 @@ const Contact = ({
       </div>
 
       {[
-        { key: 'Address1', type: 'text', placeholder: 'Address', required: true },
+        { key: 'Address1', type: 'text', placeholder: 'Address'},
         { key: 'Address2', type: 'text', placeholder: 'Apartment, Suite, Etc' },
       ].map(({ key, ...props }) => (
         <input
           key={key}
-          value={selectedContact[key] || ''}
+          value={selectedContact?.[key as keyof Contact] || ''}
           onBlur={() => handleSave()}
           onChange={(e) => setSelectedContact({ ...selectedContact, [key]: e.target.value })}
           className={`placeholder-gray-500 border-0 rounded px-2 py-1 focus:outline-none bg-yellow-50 focus:bg-yellow-100`}
@@ -125,7 +117,7 @@ const Contact = ({
         ].map(({ key, className, ...props }) => (
           <input
             key={key}
-            value={selectedContact[key] || ''}
+            value={selectedContact?.[key as keyof Contact] || ''}
             onBlur={() => handleSave()}
             onChange={(e) => setSelectedContact({ ...selectedContact, [key]: e.target.value })}
             className={`${className} placeholder-gray-500 border-0 rounded px-2 py-1 focus:outline-none bg-yellow-50 focus:bg-yellow-100`}
@@ -135,12 +127,12 @@ const Contact = ({
       </div>
 
       {[
-        { key: 'Email', type: 'email', placeholder: 'Email' },
-        { key: 'Phone', type: 'number', placeholder: 'Phone', pattern: '^\\d{10}$', title: 'Phone number must be 10 digits.' , className: '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'},
+        { key: 'Email', type: 'Email', placeholder: 'Email' },
+        { key: 'Phone', type: 'number', placeholder: 'Phone', className: '[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'},
       ].map(({ key, className, ...props }) => (
         <input
           key={key}
-          value={selectedContact[key] || ''}
+          value={selectedContact?.[key as keyof Contact] || ''}
           onBlur={() => handleSave()}
           onChange={(e) => setSelectedContact({ ...selectedContact, [key]: e.target.value })}
           className={`${className} placeholder-gray-500 border-0 rounded px-2 py-1 focus:outline-none bg-yellow-50 focus:bg-yellow-100`}
@@ -151,4 +143,4 @@ const Contact = ({
   );
 };
 
-export default Contact;
+export default ContactForm;

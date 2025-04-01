@@ -12,10 +12,6 @@
     "lint": "eslint --ext .ts,.tsx ."
   },
   "keywords": [],
-  "author": {
-    "name": "Rostislav Jadavan",
-    "email": "rostislav@jadavan.com"
-  },
   "license": "MIT",
   "devDependencies": {
     "@electron-forge/cli": "^6.2.1",

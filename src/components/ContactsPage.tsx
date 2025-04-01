@@ -1,56 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import List from '../List';
-import Contact from '../Contact';
-import SearchBar from '../SearchBar';
+import List from './List';
+import ContactForm from './ContactForm';
+import SearchBar from './SearchBar';
+import { Contact } from '../types';
 
-const ContactsPage = () => {
-  const [contacts, setContacts] = useState<any[]>([]);
-  const [selectedContact, setSelectedContact] = useState<any>({});
-  const [searchQuery, setSearchQuery] = useState('');
+interface ContactPageProps {
+  contacts: Contact[];
+  filteredContacts: Contact[];
+  fetchContacts: () => void;
+  selectedContact: Contact | null;
+  setSelectedContact?: (selectedContact: Contact | null) => void;
+  searchQuery: string; 
+  setSearchQuery: (searchQuery: string) => void;
+  handleSave: () => void;
+}
 
-  const fetchContacts = async () => {
-    const data = await window.electron.ipcRenderer.invoke('get-contacts');
-    setContacts(data);
-  };
-
-  useEffect(() => {
-    fetchContacts();
-  }, []);
-
-  const filteredContacts = contacts.filter(contact => {
-    // return (contact.FirstName == null ? console.log(contact) :
-    return (
-      contact.FirstName.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
-      contact.LastName.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
-      contact.Phone.toLowerCase().startsWith(searchQuery.toLowerCase())
-    );
-  });
+const ContactsPage: React.FC<ContactPageProps> = ({
+  contacts,
+  fetchContacts,
+  filteredContacts,
+  selectedContact,
+  setSelectedContact,
+  searchQuery,
+  setSearchQuery,
+  handleSave,
+}) => {
 
   const handleNew = async () => {
-    const result = await window.electron.ipcRenderer.invoke('create-contact', {firstName: '',lastName: '',email: '',phone: '',address1: '',address2: '',city: '',state: '',zipCode: '',
-    });
-    setSelectedContact({
-      ContactID: result.ContactID,
-      FirstName: '',
-      LastName: '',
-      Email: '',
-      Phone: '',
-      Address1: '',
-      Address2: '',
-      City: '',
-      State: '',
-      ZipCode: '',
-    });
-    fetchContacts();
+    setSelectedContact({ContactID: null, FirstName: '', LastName: '', Email: '', Phone: '', Address1: '', Address2: '', City: '', State: '', ZipCode: '',});
   };
 
   const handleDelete = async () => {
-    if (!selectedContact) return;
-    // const confirmDelete = window.confirm("Are you sure you want to delete this contact?");
+    if (!selectedContact.ContactID) return;
     if (!window.confirm("Are you sure you want to delete this contact?")) return;
     try {
       await window.electron.ipcRenderer.invoke('delete-contact', selectedContact.ContactID);
       fetchContacts();
+      setSelectedContact(null);
     } catch (error) {
       console.error('Error deleting contact:', error);
     }
@@ -58,7 +43,7 @@ const ContactsPage = () => {
 
 
   return (
-    <div className="h-full w-full flex flex-row gap-4">
+    <div className="w-full h-full flex flex-row gap-4">
       <div className="w-full flex flex-col gap-4">
         <SearchBar 
           searchQuery={searchQuery} 
@@ -85,11 +70,11 @@ const ContactsPage = () => {
         />
       </div>
       <div className="w-full bg-neutral-100 p-4">
-        <Contact 
-          fetchContacts={fetchContacts}
+        <ContactForm 
           contacts={contacts}
           selectedContact={selectedContact}
           setSelectedContact={setSelectedContact}
+          handleSave={handleSave}
         />
       </div>
     </div>

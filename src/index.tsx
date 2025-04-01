@@ -2,9 +2,9 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import Hub from './components/Hub';
 
-const root = createRoot(document.body);
+const rootElement = document.getElementById('root')!;
+const root = createRoot(rootElement);
+
 root.render(
-    <React.StrictMode>
-        <Hub />
-    </React.StrictMode>
+  <Hub />
 );

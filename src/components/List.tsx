@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const List = ({
+const List = <T extends Record<string, any>>({
   fieldNames,
   fieldValues,
   items,
@@ -9,9 +9,9 @@ const List = ({
 }: {
   fieldNames: string[];
   fieldValues: string[];
-  items: any[];
-  selectedCell?: any[];
-  setSelectedCell?: (item: any) => void;
+  items: T[];
+  selectedCell?: T;
+  setSelectedCell?: (item: T) => void;
 }) => {
   const [sortKey, setSortKey] = useState<string>(fieldValues[0]);
   const [sortOrder, setSortOrder] = useState<string>('asc');
@@ -19,7 +19,6 @@ const List = ({
   useEffect(() => {
   }, []);
 
-  // Sort function for sorting the table rows based on selected field and order
   const sortData = (data: any[], sortKey: string, order: string) => {
     return [...data].sort((a, b) => { // Create a new sorted array
       let aValue = a;
@@ -51,16 +50,16 @@ const List = ({
 
   return (
     <div className="shadow-lg rounded-lg border-2 overflow-y-auto">
-      <table className="w-full text-md text-left text-black rounded-lg">
-        <thead className="bg-green-700 text-white sticky">
-          <tr>
+      <table className="w-full text-left text-black rounded-lg">
+        <thead className="bg-green-800 text-white sticky">
+          <tr className='sticky'>
             {fieldNames.map((header, index) => (
               <th
                 key={header}
                 className="px-2 py-2.5 sticky cursor-pointer"
                 onClick={() => handleSort(fieldValues[index])} // Sort by the column index
               >
-                {`${header}${sortKey === fieldValues[index] ? sortOrder === 'asc' ? ' ↓ ' : ' ↑ ' : ' '}`}
+              {`${header}${sortKey === fieldValues[index] ? (sortOrder === 'asc' ? ' ↓ ' : ' ↑ ') : '\u00A0\u00A0\u00A0\u00A0'}`}
               </th>
             ))}
           </tr>
@@ -69,7 +68,7 @@ const List = ({
           {sortedItems.map((item, index) => (
             <tr
               key={index}
-              className={`border-2 hover:bg-neutral-200 even:bg-gray-100 odd:bg-gray-50 transition`}
+              className={`hover:bg-neutral-200 even:bg-gray-100 odd:bg-gray-50 transition`}
               onClick={() => setSelectedCell && setSelectedCell(item)}
             >
               {fieldValues.map((key, idx) => (
