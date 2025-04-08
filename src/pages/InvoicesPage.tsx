@@ -22,8 +22,8 @@ const InvoicesPage : React.FC = () => {
         </div>
         <SearchBar />
         <List
-          fieldNames={['ID', 'Date', 'First Name', 'Last Name', 'Total', 'Due', 'Paid', 'Status']}
-          fieldValues={['InvoiceID', 'InvoiceDate', 'Contact.FirstName', 'Contact.LastName', 'TotalAmount', 'DueAmount', 'PaidAmount', 'Status']}
+          fieldNames={['ID', 'Date', 'First Name', 'Last Name', 'Total', 'Paid', 'Status']}
+          fieldValues={['InvoiceID', 'InvoiceDate', 'Contact.FirstName', 'Contact.LastName', 'TotalAmount', 'PaidAmount', 'Status']}
           items={filteredInvoicesWithContacts}
           selectedCell={selectedInvoice}
           setSelectedCell={setSelectedInvoice}
