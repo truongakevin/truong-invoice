@@ -1,6 +1,6 @@
 import { useAppContext, NewButton, DeleteButton } from '../AppContext';
 import List from '../components/List';
-import ContactForm from '../components/ContactForm';
+import ContactForm from '../forms/ContactForm';
 import SearchBar from '../components/SearchBar';
 import ResizablePanel from '../components/ResizablePanel';
 
