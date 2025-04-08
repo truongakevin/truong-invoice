@@ -1,0 +1,71 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@font-face {
+  font-family: 'Work Sans';
+  
+  src: url('/Users/kevintruong/programming/projects/truong-invoice/public/fonts/Work_Sans/WorkSans-VariableFont_wght.ttf') format('truetype');
+}
+
+body {
+  font-family: 'Work Sans', sans-serif;
+}
+    
+@layer base {
+
+  /* Custom scrollbar styles */
+  ::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-green-800 rounded transition;
+  }
+
+  * {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .topbar > * {
+    -webkit-app-region: no-drag; /* Allow interaction with buttons or links */
+  }
+  
+  .topbar {
+    -webkit-app-region: drag;
+  }
+  
+  
+  h1 {
+    @apply text-3xl font-bold;
+    /* @apply text-3xl font-bold bg-red-500; */
+  }
+
+  h2 {
+    @apply text-2xl font-semibold;
+    /* @apply text-2xl font-semibold bg-orange-500; */
+  }
+
+  h3 {
+    @apply text-lg font-semibold;
+    /* @apply text-lg font-semibold bg-yellow-500; */
+  }
+
+  h4 {
+    @apply text-base font-semibold;
+    /* @apply text-base font-semibold bg-green-500; */
+  }
+
+  .inputdiv {
+    @apply placeholder-gray-500 px-2 py-1 focus:outline-none focus:bg-green-50 bg-green-100
+  }
+
+  .textareadiv {
+    @apply placeholder-gray-500 overflow-hidden resize-none px-1 py-1 focus:outline-none focus:bg-green-50 bg-green-100
+  }
+}

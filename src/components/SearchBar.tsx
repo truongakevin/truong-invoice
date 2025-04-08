@@ -1,12 +1,12 @@
 import React from 'react';
+import { useAppContext } from '../AppContext';
 
-const SearchBar = ({ 
-  searchQuery, 
-  setSearchQuery
-}: { 
-  searchQuery: string, 
-  setSearchQuery: React.Dispatch<React.SetStateAction<string>>
-}) => {
+const SearchBar: React.FC = () => {
+  const {
+    searchQuery,
+    setSearchQuery,
+  } = useAppContext();
+  
   return (
     <div className="">
       <input
@@ -14,7 +14,7 @@ const SearchBar = ({
         placeholder="Search Contacts..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full border-2 shadow-lg rounded-lg px-2 py-1 text-lg focus:outline-none focus:ring-2 focus:ring-green-600 placeholder:text-neutral-500"
+        className="w-full border-2 px-2 py-1 focus:outline-none focus:ring-2 focus:ring-green-800 placeholder:text-neutral-500"
       />
     </div>
   );

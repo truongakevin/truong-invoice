@@ -1,48 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Contact, Invoice, Service } from '../../types';
+import { useAppContext } from '../AppContext';
+import { Service } from '../types';
 
-const InvoiceServicesForm = ({
-  contacts,
-  fetchContacts,
-  invoices,
-  fetchInvoices,
-  services,
-  fetchServices,
-  selectedContact,
-  setSelectedContact,
-  selectedInvoice,
-  setSelectedInvoice,
-  invoiceServices,
-  setInvoiceServices,
-  handleSave,
-} : { 
-  contacts: Contact[];
-  fetchContacts: () => void;
-  invoices: Invoice[];
-  fetchInvoices: () => void;
-  services: Service[];
-  fetchServices: () => void;
-  selectedContact: Contact | null;
-  setSelectedContact?: (selectedContact: Contact | null) => void;
-  selectedInvoice: Invoice | null; 
-  setSelectedInvoice: (selectedInvoice: Invoice | null) => void;
-  invoiceServices: Service[] | null;
-  setInvoiceServices: (invoiceServices: Service[] | null) => void;
-  handleSave: () => void;
-}) => {
+const ServicesForm : React.FC = () => {
+  const {
+    services,
+    fetchServices,
+    selectedInvoice,
+    invoiceServices,
+    setInvoiceServices,
+    handleSave,
+  } = useAppContext();
 
   const [filteredDropdownInvoiceServices, setFilteredDropdownInvoiceServices] = useState<any[]>([]);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  useEffect(() => {    
-    setInvoiceServices([
-      ...services.filter(service => service.InvoiceID === selectedInvoice?.InvoiceID),
-      ...(selectedInvoice?.InvoiceID 
-        ? [{ ServiceID: null, InvoiceID: selectedInvoice?.InvoiceID ?? null,ServiceDescription: '', ServiceDate: '', Quantity: 0, Rate: 0 }] 
-        : []),
-    ]);
-  }, [selectedInvoice?.InvoiceID]);
+  useEffect(() => {
+    if (selectedInvoice?.InvoiceID) {
+      setInvoiceServices([
+        ...services.filter(service => service.InvoiceID === selectedInvoice?.InvoiceID),
+        { ServiceID: null, InvoiceID: selectedInvoice.InvoiceID, ServiceDescription: '', ServiceDate: '', Quantity: 0, Rate: 0 }
+      ]);
+    } else {
+      setInvoiceServices(null)
+    }
+  }, [selectedInvoice?.InvoiceID]); 
   
   const fetchFilteredDropdownInvoiceServices = async (query: string) => {
     const uniqueInvoiceServices = services.filter((service: any, index: number, self: any[]) =>
@@ -53,13 +36,6 @@ const InvoiceServicesForm = ({
         service['ServiceDescription'].toLowerCase().startsWith(query.toLowerCase())
       )
     );
-  };
-
-  const handleMoneyInput = (value: string): string => {
-    const match = value.match(/\d+/g);
-    if (!match) return '';
-    const formatted = parseFloat(match.join('')).toString().padStart(3, '0');
-    return `${formatted.slice(0, -2)}.${formatted.slice(-2)}`;
   };
 
   const handleInputChange = async (index: number, field: keyof Service, e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -107,24 +83,24 @@ const InvoiceServicesForm = ({
 
   return (
     <div className="w-full overflow-y-auto">
-      <div className='flex flex-row'>
-        <h2 className="font-bold text-lg">Services</h2>
-      </div>
+      {invoiceServices && <div className='flex flex-row'>
+        <h3 className="font-bold text-lg">Services</h3>
+      </div>}
 
-      <div className="w-full flex flex-row">
-        <div className="w-full bg-purple-200">Service Date</div>
-        <div className="w-full bg-red-200">Service Description</div>
-        <div className="w-full bg-yellow-200">Quantity</div>
-        <div className="w-full bg-blue-200">Rate</div>
-        <div className="w-full bg-green-200">Total</div>
-      </div>
+      {invoiceServices && <div className="w-full flex flex-row gap-2">
+        <div className="w-3/12 bbg-purple-200">Service Date</div>
+        <div className="w-6/12 bbg-red-200">Service Description</div>
+        <div className="w-1/12 bbg-yellow-200">Quantity</div>
+        <div className="w-1/12 bbg-blue-200">Rate</div>
+        <div className="w-1/12 bbg-green-200">Total</div>
+      </div>}
 
       <div className="flex flex-col gap-2">
         {invoiceServices?.map((service, index) => (
-          <div key={index} className="flex flex-row border-2 border-black">
-            <div className="celldiv w-full flex flex-row">
+          <div key={index} className="flex flex-row gap-2">
+            <div className="bg-green-800 flex flex-row w-3/12">
               <textarea
-                className="textarea bg-yellow-50 focus:bg-yellow-100 cell h-full w-full flex overflow-hidden resize-none focus:outline-none"
+                className="textareadiv w-full"
                 value={service?.ServiceDate}
                 onChange={(e) => handleInputChange(index, 'ServiceDate', e)}
                 onBlur={() => handleSave()}
@@ -132,9 +108,9 @@ const InvoiceServicesForm = ({
                 onInput={handleResizeInput}
               />
             </div>
-            <div className="celldiv w-full flex flex-row">
+            <div className="flex flex-row w-6/12">
               <textarea
-                className="textarea bg-yellow-50 focus:bg-yellow-100 cell h-full w-full flex overflow-hidden resize-none focus:outline-none"
+                className="textareadiv w-full"
                 value={service?.ServiceDescription}
                 onChange={(e) => handleInputChange(index, 'ServiceDescription', e)}
                 rows={1}
@@ -142,7 +118,7 @@ const InvoiceServicesForm = ({
                 onInput={handleResizeInput}
               />
               {isDropdownVisible && activeIndex === index-1 && filteredDropdownInvoiceServices.length > 0 && (
-                <div className="absolute bg-white shadow-sm w-fit border rounded-md mt-1 z-20"
+                <div className="absolute bg-white w-fit -mt-1"
                   onMouseDown={(e) => e.preventDefault()}>
                   {filteredDropdownInvoiceServices.map((service, idx) => (
                     <div key={idx} className="px-3 py-2 cursor-pointer hover:bg-gray-200" onClick={() => handleSelectServiceDescription(index-1, service.ServiceDescription)}>
@@ -152,9 +128,9 @@ const InvoiceServicesForm = ({
                 </div>
               )}
             </div>
-            <div className="celldiv w-full flex flex-row">
+            <div className="flex flex-row w-1/12">
               <textarea
-                className="textarea bg-yellow-50 focus:bg-yellow-100 cell h-full w-full flex overflow-hidden resize-none focus:outline-none"
+                className="textareadiv w-full"
                 value={service?.Quantity}
                 onChange={(e) => handleInputChange(index, 'Quantity', e)}
                 onKeyDown={(e) => {if (e.key === 'Enter') e.preventDefault();}}
@@ -163,9 +139,9 @@ const InvoiceServicesForm = ({
                 onInput={handleResizeInput}
               />
             </div>
-            <div className="celldiv w-full flex flex-row">
-              $<textarea
-                className="textarea bg-yellow-50 focus:bg-yellow-100 cell h-full w-full flex overflow-hidden resize-none focus:outline-none"
+            <div className="flex flex-row w-1/12">
+              <textarea
+                className="textareadiv w-full"
                 value={service?.Rate}
                 onChange={(e) => handleInputChange(index, 'Rate', e)}
                 onKeyDown={(e) => {if (e.key === 'Enter') e.preventDefault();}}
@@ -174,8 +150,8 @@ const InvoiceServicesForm = ({
                 onInput={handleResizeInput}
               />
             </div>
-            <div className="celldiv w-full flex flex-row">
-              <div className="totalcell bg-yellow-50 focus:bg-yellow-100 cell h-full w-full flex overflow-hidden resize-none focus:outline-none">
+            <div className="flex flex-row w-1/12">
+              <div className="textareadiv w-full">
                 ${(service?.Quantity * service?.Rate).toFixed(2)}
               </div>
             </div>
@@ -186,4 +162,4 @@ const InvoiceServicesForm = ({
   );
 };
 
-export default InvoiceServicesForm;
+export default ServicesForm;

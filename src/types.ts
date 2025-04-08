@@ -1,5 +1,3 @@
-// src/types.ts
-
 export interface Contact {
 	ContactID: number;
 	FirstName: string;
