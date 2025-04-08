@@ -44,43 +44,93 @@ INSERT INTO Contacts (FirstName, LastName, Email, Phone, Address1, City, State, 
 ('Hudson', 'Edwards', 'hudson.edwards@example.com', 3037890123, '2525 Cedar St', 'Telluride', 'CO', 81435);
 
 -- Insert sample invoices
-INSERT INTO Invoices (ContactID, InvoiceDate, DueDate, TotalAmount, PaidAmount, DueAmount, Status) VALUES
-(1, '2025-03-01', '2025-03-15', 500.00, 250.00, 250.00, 'Pending'),
-(8, '2025-03-05', '2025-03-20', 350.00, 0.00, 350.00, 'Pending'),
-(27, '2025-03-10', '2025-03-25', 1000.00, 500.00, 500.00, 'Paid'),
-(4, '2025-03-12', '2025-03-26', 150.00, 150.00, 0.00, 'Paid'),
-(20, '2025-03-15', '2025-03-30', 800.00, 0.00, 800.00, 'Pending'),
-(17, '2025-03-18', '2025-04-02', 200.00, 0.00, 200.00, 'Pending'),
-(16, '2025-03-20', '2025-04-04', 600.00, 300.00, 300.00, 'Pending'),
-(9, '2025-03-22', '2025-04-06', 400.00, 0.00, 400.00, 'Pending'),
-(14, '2025-03-25', '2025-04-09', 700.00, 700.00, 0.00, 'Paid'),
-(21, '2025-03-28', '2025-04-12', 900.00, 0.00, 900.00, 'Pending'),
-(32, '2025-03-28', '2025-04-12', 900.00, 0.00, 900.00, 'Pending'),
-(29, '2025-03-29', '2025-04-13', 300.00, 150.00, 150.00, 'Pending'),
-(12, '2025-03-30', '2025-04-14', 500.00, 200.00, 300.00, 'Pending'),
-(25, '2025-04-01', '2025-04-15', 1200.00, 1200.00, 0.00, 'Paid'),
-(14, '2025-04-02', '2025-04-16', 750.00, 0.00, 750.00, 'Pending'),
-(15, '2025-04-03', '2025-04-17', 450.00, 450.00, 0.00, 'Paid'),
-(21, '2025-04-04', '2025-04-18', 1100.00, 600.00, 500.00, 'Pending'),
-(17, '2025-04-05', '2025-04-19', 950.00, 950.00, 0.00, 'Paid'),
-(2, '2025-04-06', '2025-04-20', 700.00, 300.00, 400.00, 'Pending'),
-(4, '2025-04-07', '2025-04-21', 250.00, 250.00, 0.00, 'Paid'),
-(20, '2025-04-08', '2025-04-22', 850.00, 400.00, 450.00, 'Pending'),
-(21, '2025-03-29', '2025-04-13', 450.00, 0.00, 450.00, 'Pending'),
-(21, '2025-03-30', '2025-04-14', 700.00, 350.00, 350.00, 'Pending'),
-(4, '2025-03-31', '2025-04-15', 1200.00, 600.00, 600.00, 'Pending'),
-(24, '2025-04-01', '2025-04-16', 250.00, 250.00, 0.00, 'Paid'),
-(23, '2025-04-02', '2025-04-17', 500.00, 500.00, 0.00, 'Paid'),
-(26, '2025-04-03', '2025-04-18', 350.00, 0.00, 350.00, 'Pending'),
-(27, '2025-04-04', '2025-04-19', 450.00, 0.00, 450.00, 'Pending'),
-(12, '2025-04-05', '2025-04-20', 650.00, 300.00, 350.00, 'Pending'),
-(19, '2025-04-06', '2025-04-21', 800.00, 0.00, 800.00, 'Pending'),
-(30, '2025-04-07', '2025-04-22', 1000.00, 0.00, 1000.00, 'Pending');
+INSERT INTO Invoices (ContactID, InvoiceDate, DueDate, TotalAmount, PaidAmount, Status) VALUES
+(1, '2025-03-01', '2025-03-15', 500.00, 250.00, 'Pending'),
+(8, '2025-03-05', '2025-03-20', 350.00, 0.00, 'Pending'),
+(27, '2025-03-10', '2025-03-25', 1000.00, 500.00, 'Paid'),
+(4, '2025-03-12', '2025-03-26', 150.00, 150.00, 'Paid'),
+(20, '2025-03-15', '2025-03-30', 800.00, 0.00, 'Pending'),
+(17, '2025-03-18', '2025-04-02', 200.00, 0.00, 'Pending'),
+(16, '2025-03-20', '2025-04-04', 600.00, 300.00, 'Pending'),
+(9, '2025-03-22', '2025-04-06', 400.00, 0.00, 'Pending'),
+(14, '2025-03-25', '2025-04-09', 700.00, 700.00, 'Paid'),
+(21, '2025-03-28', '2025-04-12', 900.00, 0.00, 'Pending'),
+(32, '2025-03-28', '2025-04-12', 900.00, 0.00, 'Pending'),
+(29, '2025-03-29', '2025-04-13', 300.00, 150.00, 'Pending'),
+(12, '2025-03-30', '2025-04-14', 500.00, 200.00, 'Pending'),
+(25, '2025-04-01', '2025-04-15', 1200.00, 1200.00, 'Paid'),
+(14, '2025-04-02', '2025-04-16', 750.00, 0.00, 'Pending'),
+(15, '2025-04-03', '2025-04-17', 450.00, 450.00, 'Paid'),
+(21, '2025-04-04', '2025-04-18', 1100.00, 600.00, 'Pending'),
+(17, '2025-04-05', '2025-04-19', 950.00, 950.00, 'Paid'),
+(2, '2025-04-06', '2025-04-20', 700.00, 300.00, 'Pending'),
+(4, '2025-04-07', '2025-04-21', 250.00, 250.00, 'Paid'),
+(20, '2025-04-08', '2025-04-22', 850.00, 400.00, 'Pending'),
+(21, '2025-03-29', '2025-04-13', 450.00, 0.00, 'Pending'),
+(21, '2025-03-30', '2025-04-14', 700.00, 350.00, 'Pending'),
+(4, '2025-03-31', '2025-04-15', 1200.00, 600.00, 'Pending'),
+(24, '2025-04-01', '2025-04-16', 250.00, 250.00, 'Paid'),
+(23, '2025-04-02', '2025-04-17', 500.00, 500.00, 'Paid'),
+(26, '2025-04-03', '2025-04-18', 350.00, 0.00, 'Pending'),
+(27, '2025-04-04', '2025-04-19', 450.00, 0.00, 'Pending'),
+(12, '2025-04-05', '2025-04-20', 650.00, 300.00, 'Pending'),
+(19, '2025-04-06', '2025-04-21', 800.00, 0.00, 'Pending'),
+(30, '2025-04-07', '2025-04-22', 1000.00, 0.00, 'Pending');
+
+
+-- Insert sample estimates
+INSERT INTO Estimates (ContactID, EstimateDate, TotalAmount) VALUES
+(1, '2024-12-01', 500.00),
+(2, '2024-12-02', 950.50),
+(3, '2024-12-03', 1200.00),
+(4, '2024-12-04', 350.75),
+(5, '2024-12-05', 765.40),
+(6, '2024-12-06', 215.90),
+(7, '2024-12-07', 1500.00),
+(8, '2024-12-08', 980.00),
+(9, '2024-12-09', 450.00),
+(10, '2024-12-10', 875.25),
+(1, '2024-12-11', 300.00),
+(2, '2024-12-12', 1195.00),
+(3, '2024-12-13', 499.99),
+(4, '2024-12-14', 100.00),
+(5, '2024-12-15', 1300.00),
+(6, '2024-12-16', 210.50),
+(7, '2024-12-17', 805.00),
+(8, '2024-12-18', 670.75),
+(9, '2024-12-19', 399.95),
+(10, '2024-12-20', 222.22),
+(1, '2024-12-21', 1550.00),
+(2, '2024-12-22', 315.00),
+(3, '2024-12-23', 899.99),
+(4, '2024-12-24', 625.00),
+(5, '2024-12-25', 940.40),
+(6, '2024-12-26', 799.99),
+(7, '2024-12-27', 450.00),
+(8, '2024-12-28', 1100.00),
+(9, '2024-12-29', 999.95),
+(10, '2024-12-30', 250.00);
 
 -- Insert sample services
 INSERT INTO Services (InvoiceID, ServiceDescription, ServiceDate, Quantity, Rate) VALUES
 (1, 'Web Development', '2025-03-01', 10, 50.00),
 (1, 'SEO Optimization', '2025-03-02', 5, 30.00),
+(1, 'Website Hosting', '2025-03-15', 12, 50.00),
+(1, 'Consulting Services', '2025-03-05', 7, 45.00),
+(2, 'Consulting Services', '2025-03-05', 7, 45.00),
+(3, 'Graphic Design', '2025-03-10', 15, 60.00),
+(3, 'Branding Package', '2025-03-10', 10, 100.00),
+(4, 'Product Photography', '2025-03-12', 8, 20.00),
+(5, 'Website Hosting', '2025-03-15', 12, 50.00),
+(6, 'Email Marketing', '2025-03-18', 4, 50.00),
+(7, 'App Development', '2025-03-20', 5, 100.00),
+(8, 'Content Creation', '2025-03-22', 3, 60.00),
+(9, 'UI/UX Design', '2025-03-25', 6, 80.00),
+(10, 'Cloud Hosting', '2025-03-28', 10, 70.00);
+INSERT INTO Services (EstimateID, ServiceDescription, ServiceDate, Quantity, Rate) VALUES
+(1, 'Web Development', '2025-03-01', 10, 50.00),
+(1, 'SEO Optimization', '2025-03-02', 5, 30.00),
+(1, 'Website Hosting', '2025-03-15', 12, 50.00),
 (1, 'Consulting Services', '2025-03-05', 7, 45.00),
 (2, 'Consulting Services', '2025-03-05', 7, 45.00),
 (3, 'Graphic Design', '2025-03-10', 15, 60.00),
@@ -106,22 +156,26 @@ export const openDb = async () => {
   // Drop all entries in the database
   await db.exec(`DROP TABLE IF EXISTS Contacts;`);
   await db.exec(`DROP TABLE IF EXISTS Invoices;`);
+  await db.exec(`DROP TABLE IF EXISTS Estimates;`);
+  await db.exec(`DROP TABLE IF EXISTS Payments;`);
   await db.exec(`DROP TABLE IF EXISTS Services;`);
   console.log('All existing data cleared');
 
   // Create tables if they don't exist
+  await db.exec('PRAGMA foreign_keys = ON');
+
   await db.exec(`
     CREATE TABLE IF NOT EXISTS Contacts (
       ContactID INTEGER PRIMARY KEY AUTOINCREMENT,
       FirstName TEXT,
       LastName TEXT,
       Email TEXT,
-      Phone INTEGER,
+      Phone TEXT,
       Address1 TEXT,
       Address2 TEXT,
       City TEXT,
       State TEXT,
-      ZipCode INTEGER
+      ZipCode TEXT
     );
   `);
 
@@ -133,9 +187,29 @@ export const openDb = async () => {
       DueDate TEXT,
       TotalAmount REAL,
       PaidAmount REAL,
-      DueAmount REAL,
       Status TEXT,
-      FOREIGN KEY(ContactID) REFERENCES Contacts(ContactID)
+      FOREIGN KEY(ContactID) REFERENCES Contacts(ContactID) ON DELETE CASCADE
+    );
+  `);
+
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS Estimates (
+      EstimateID INTEGER PRIMARY KEY AUTOINCREMENT,
+      ContactID INTEGER,
+      EstimateDate TEXT,
+      TotalAmount REAL,
+      FOREIGN KEY(ContactID) REFERENCES Contacts(ContactID) ON DELETE CASCADE
+    );
+  `);
+
+  await db.exec(`
+    CREATE TABLE IF NOT EXISTS Payments (
+      PaymentID INTEGER PRIMARY KEY AUTOINCREMENT,
+      InvoiceID INTEGER,
+      PaymentDate TEXT,
+      Amount REAL,
+      Method TEXT,
+      FOREIGN KEY(InvoiceID) REFERENCES Invoices(InvoiceID) ON DELETE CASCADE
     );
   `);
 
@@ -143,11 +217,17 @@ export const openDb = async () => {
     CREATE TABLE IF NOT EXISTS Services (
       ServiceID INTEGER PRIMARY KEY AUTOINCREMENT,
       InvoiceID INTEGER,
+      EstimateID INTEGER,
       ServiceDescription TEXT,
       ServiceDate TEXT,
       Quantity INTEGER,
       Rate REAL,
-      FOREIGN KEY(InvoiceID) REFERENCES Invoices(InvoiceID)
+      FOREIGN KEY(InvoiceID) REFERENCES Invoices(InvoiceID) ON DELETE CASCADE,
+      FOREIGN KEY(EstimateID) REFERENCES Estimates(EstimateID) ON DELETE CASCADE,
+      CHECK (
+        (InvoiceID IS NOT NULL AND EstimateID IS NULL) OR 
+        (InvoiceID IS NULL AND EstimateID IS NOT NULL)
+      )
     );
   `);
 
