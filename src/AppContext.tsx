@@ -1,27 +1,31 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Contact, Invoice, Service } from './types';
+import { Contact, Invoice, Estimate, Payment, Service } from './types';
 
 interface AppContextType {
   activeTab: string;
   setActiveTab: React.Dispatch<React.SetStateAction<string>>;
   contacts: Contact[];
   invoices: Invoice[];
+  estimates: Estimate[];
   services: Service[];
+  payments: Payment[];
   selectedContact: Contact | null;
   selectedInvoice: Invoice | null;
-  invoiceServices: Service[] | null;
+  selectedEstimate: Estimate | null;
+  formServices: Service[] | null;
   searchQuery: string;
   filteredContacts: Contact[];
   filteredInvoicesWithContacts: Invoice[];
+  filteredEstimatesWithContacts: Estimate[];
   fetchContacts: () => void;
   fetchInvoices: () => void;
+  fetchEstimates: () => void;
   fetchServices: () => void;
-  setContacts: React.Dispatch<React.SetStateAction<Contact[]>>;
-  setInvoices: React.Dispatch<React.SetStateAction<Invoice[]>>;
-  setServices: React.Dispatch<React.SetStateAction<Service[]>>;
+  fetchPayments: () => void;
   setSelectedContact: React.Dispatch<React.SetStateAction<Contact | null>>;
   setSelectedInvoice: React.Dispatch<React.SetStateAction<Invoice | null>>;
-  setInvoiceServices: React.Dispatch<React.SetStateAction<Service[] | null>>;
+  setSelectedEstimate: React.Dispatch<React.SetStateAction<Estimate | null>>;
+  setFormServices: React.Dispatch<React.SetStateAction<Service[] | null>>;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
   handleSave: () => void;
 }
@@ -33,13 +37,16 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  const [activeTab, setActiveTab] = useState<'Home' | 'Invoices' | 'Contacts' | 'Estimates' | 'Payments' | 'Settings'>('Invoices');
+  const [activeTab, setActiveTab] = useState<'Home' | 'Invoices' | 'Contacts' | 'Estimates' | 'Payments' | 'Settings'>('Estimates');
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [estimates, setEstimates] = useState<Estimate[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-  const [invoiceServices, setInvoiceServices] = useState<Service[] | null>(null);
+  const [selectedEstimate, setSelectedEstimate] = useState<Estimate | null>(null);
+  const [formServices, setFormServices] = useState<Service[] | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const fetchContacts = async (): Promise<void> => {
@@ -56,12 +63,24 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     const data: Service[] = await window.electron.ipcRenderer.invoke('get-services');
     setServices(data);
   };
+  
+  const fetchEstimates = async (): Promise<void> => {
+    const data: Estimate[] = await window.electron.ipcRenderer.invoke('get-estimates');
+    setEstimates(data);
+  };
+
+  const fetchPayments = async (): Promise<void> => {
+    const data: Payment[] = await window.electron.ipcRenderer.invoke('get-payments');
+    setPayments(data);
+  };
 
   // Fetch data on initial load
   useEffect(() => {
     fetchContacts();
     fetchInvoices();
     fetchServices();
+    fetchEstimates();
+    fetchPayments();
   }, []);
 
   const filteredContacts = contacts.filter(contact => {
@@ -88,11 +107,28 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         String(Contact?.Address1)?.toLowerCase().startsWith(query)
       );
   });
+  
+  const filteredEstimatesWithContacts = estimates
+    .map(estimate => ({
+      ...estimate,
+      Contact: contacts.find(contact => contact.ContactID === estimate.ContactID) as Contact || selectedContact
+    }))
+    .filter(estimate => {
+      const { Contact } = estimate;
+      const query = searchQuery.toLowerCase();
+      return (
+        String(Contact?.FirstName)?.toLowerCase().startsWith(query) ||
+        String(Contact?.LastName)?.toLowerCase().startsWith(query) ||
+        String(Contact?.Phone)?.toLowerCase().startsWith(query) ||
+        String(Contact?.Address1)?.toLowerCase().startsWith(query)
+      );
+  });
 
   const handleSave = async () => {
     const saveContact = selectedContact ? { ...selectedContact } : null;
     const saveInvoice = selectedInvoice ? { ...selectedInvoice } : null;
-    const saveServices = invoiceServices ? [...invoiceServices] : null;
+    const saveEstimate = selectedEstimate ? { ...selectedEstimate } : null;
+    const saveServices = formServices ? [...formServices] : null;
 
     if (saveContact?.FirstName && saveContact?.LastName && saveContact?.Address1) {
       if (saveContact.ContactID) {
@@ -128,57 +164,83 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       }
       fetchInvoices();
     }
+
+    if (saveContact?.ContactID && saveEstimate?.EstimateDate) {
+      const totalAmount = saveServices?.reduce((acc, { Quantity, Rate }) => acc + (Quantity * Rate || 0), 0).toFixed(2);
+      saveEstimate.TotalAmount = parseFloat(totalAmount);
+
+      if (saveEstimate.EstimateID) {
+        await window.electron.ipcRenderer.invoke('update-estimate', saveEstimate);
+        console.log("updated estimate");
+      } else {
+        saveEstimate.ContactID = saveContact.ContactID
+
+        const estimate = await window.electron.ipcRenderer.invoke('create-estimate', saveEstimate);
+        saveEstimate.EstimateID = estimate.EstimateID;
+        console.log("created estimate");
+      }
+      fetchEstimates();
+    }
     
     saveServices?.map(async (service, index) => {
-      if (service.ServiceDescription && service.ServiceDate && service.Quantity && service.Rate && selectedInvoice?.InvoiceID) {
+      if (service.ServiceDescription && service.ServiceDate && service.Quantity && service.Rate && (
+        activeTab == "Invoices" && selectedInvoice?.InvoiceID || 
+        activeTab == "Estimates" && selectedEstimate?.EstimateID
+        )) {
         const serviceData = {
           ServiceID: service?.ServiceID,
-          InvoiceID: saveInvoice.InvoiceID,
+          InvoiceID: activeTab == "Invoices" ? saveInvoice.InvoiceID : null,
+          EstimateID: activeTab == "Estimates" ? saveEstimate.EstimateID : null,
           ServiceDate: service.ServiceDate,
           ServiceDescription: service.ServiceDescription,
           Quantity: service.Quantity,
           Rate: service.Rate,
         };
-
+        console.log(serviceData)
         if (service.ServiceID) {
           await window.electron.ipcRenderer.invoke('update-service', {...serviceData});
-          console.log("updated service",serviceData);
+          console.log("updated service");
         } else {
           const newService = await window.electron.ipcRenderer.invoke('create-service', serviceData);
           saveServices[index] = { ...service, ServiceID: newService.ServiceID };
-          console.log("created service",serviceData);
+          console.log("created service");
         }
         await fetchServices();
       }
     })
     setSelectedContact(saveContact);
     setSelectedInvoice(saveInvoice);
-    setInvoiceServices(saveServices);
+    setSelectedEstimate(saveEstimate);
+    setFormServices(saveServices);
   };
 
   return (
     <AppContext.Provider
       value={{
-        activeTab, 
+        activeTab,
         setActiveTab,
         contacts,
         invoices,
+        estimates,
         services,
+        payments,
         selectedContact,
         selectedInvoice,
-        invoiceServices,
+        selectedEstimate,
+        formServices,
         searchQuery,
         filteredContacts,
         filteredInvoicesWithContacts,
+        filteredEstimatesWithContacts,
         fetchContacts,
         fetchInvoices,
+        fetchEstimates,
         fetchServices,
-        setContacts,
-        setInvoices,
-        setServices,
+        fetchPayments,
         setSelectedContact,
         setSelectedInvoice,
-        setInvoiceServices,
+        setSelectedEstimate,
+        setFormServices,
         setSearchQuery,
         handleSave,
       }}
@@ -201,10 +263,10 @@ export const NewButton: React.FC = () => {
     activeTab,
     setSelectedContact,
     setSelectedInvoice,
-    setInvoiceServices,
+    setSelectedEstimate,
     fetchContacts,
     fetchInvoices,
-    fetchServices
+    fetchEstimates
   } = useAppContext();
 
   const handleNew = () => {
@@ -215,17 +277,15 @@ export const NewButton: React.FC = () => {
         break;
       case 'Invoices':
         setSelectedContact(null);
-        setSelectedInvoice(null);   
-        setInvoiceServices(null);
+        setSelectedInvoice(null);
         fetchContacts();
         fetchInvoices();
-        fetchServices();
-        break;
-      case 'Payments':
-        // Add logic for new payment if needed
         break;
       case 'Estimates':
-        // Add logic for new estimate if needed
+        setSelectedContact(null);
+        setSelectedEstimate(null);
+        fetchContacts();
+        fetchEstimates();
         break;
       default:
         break;
@@ -247,10 +307,14 @@ export const DeleteButton: React.FC = () => {
     activeTab,
     selectedContact,
     selectedInvoice,
+    selectedEstimate,
     fetchContacts,
     fetchInvoices,
+    fetchEstimates,
+    fetchServices,
     setSelectedContact,
     setSelectedInvoice,
+    setSelectedEstimate,
   } = useAppContext();
 
   const handleDelete = async () => {
@@ -258,25 +322,38 @@ export const DeleteButton: React.FC = () => {
       switch (activeTab) {
         case 'Contacts':
           if (selectedContact?.ContactID) {
-            if (!window.confirm("Are you sure you want to delete this item?")) return;
+            if (!window.confirm("Are you sure you want to delete this contact?")) return;
             await window.electron.ipcRenderer.invoke('delete-contact', selectedContact.ContactID);
             setSelectedContact(null);
             fetchContacts();
+            fetchInvoices();
+            fetchEstimates();
+            fetchServices();
           }
           break;
         case 'Invoices':
           if (selectedInvoice?.InvoiceID) {
-            if (!window.confirm("Are you sure you want to delete this item?")) return;
+            if (!window.confirm("Are you sure you want to delete this invoice?")) return;
             await window.electron.ipcRenderer.invoke('delete-invoice', selectedInvoice.InvoiceID);
+            setSelectedContact(null);
             setSelectedInvoice(null);
+            fetchContacts();
             fetchInvoices();
+            fetchEstimates();
+            fetchServices();
           }
           break;
-        case 'Payments':
-          // Add logic to delete payment if needed
-          break;
         case 'Estimates':
-          // Add logic to delete estimate if needed
+          if (selectedEstimate?.EstimateID) {
+            if (!window.confirm("Are you sure you want to delete this estimate?")) return;
+            await window.electron.ipcRenderer.invoke('delete-estimate', selectedEstimate.EstimateID);
+            setSelectedContact(null);
+            setSelectedEstimate(null);
+            fetchContacts();
+            fetchInvoices();
+            fetchEstimates();
+            fetchServices();
+          }
           break;
         default:
           break;
@@ -291,7 +368,8 @@ export const DeleteButton: React.FC = () => {
       onClick={handleDelete}
       className={`px-6 p-2 font-bold text-white
         ${(activeTab == "Contacts" && selectedContact?.ContactID) ||
-          (activeTab == "Invoices" && selectedInvoice?.InvoiceID)
+          (activeTab == "Invoices" && selectedInvoice?.InvoiceID) ||
+          (activeTab == "Estimates" && selectedEstimate?.EstimateID)
           ? "bg-red-600 hover:bg-red-700" : "bg-red-900 cursor-not-allowed"
         }`}
     >

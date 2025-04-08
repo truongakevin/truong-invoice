@@ -4,8 +4,7 @@ import ServicesForm from './ServicesForm';
 import ContactForm from './ContactForm';
 
 const InvoiceForm : React.FC = () => {
-  const {    
-    invoices,
+  const {
     contacts,
     fetchInvoices,
     setSelectedContact,

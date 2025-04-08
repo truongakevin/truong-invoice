@@ -29,8 +29,8 @@ const InvoicesPage : React.FC = () => {
           setSelectedCell={setSelectedInvoice}
         />
         <List
-          fieldNames={['Service ID', 'Invoice ID', 'Service Date', 'Service Description', 'Quantity', 'Rate']}
-          fieldValues={['ServiceID', 'InvoiceID', 'ServiceDate', 'ServiceDescription', 'Quantity', 'Rate']}
+          fieldNames={['Service ID', 'Invoice', 'Estimate', 'Service Date', 'Service Description', 'Quantity', 'Rate']}
+          fieldValues={['ServiceID', 'InvoiceID', 'EstimateID', 'ServiceDate', 'ServiceDescription', 'Quantity', 'Rate']}
           items={services}
         />
       </div>
