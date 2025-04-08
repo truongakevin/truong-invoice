@@ -5,6 +5,7 @@ import ContactForm from './ContactForm';
 
 const InvoiceForm : React.FC = () => {
   const {    
+    invoices,
     contacts,
     fetchInvoices,
     setSelectedContact,
@@ -12,6 +13,15 @@ const InvoiceForm : React.FC = () => {
     setSelectedInvoice,
     handleSave,
   } = useAppContext();
+
+  // Load Invoice
+  // useEffect(() => {
+  //   if(!selectedInvoice?.InvoiceID && invoices){
+  //     setSelectedInvoice(invoices.find(invoice => invoice.InvoiceID == 1));
+  //     console.log(invoices);
+  //     console.log(invoices.find(invoice => invoice.ContactID = 1));
+  //   }
+  // }, [invoices]);
 
   useEffect(() => {
     if (selectedInvoice?.InvoiceID && selectedInvoice?.ContactID) {
@@ -33,7 +43,7 @@ const InvoiceForm : React.FC = () => {
         <div className='flex flex-row justify-between font-bold'>
           <h3 className="">Invoice Date</h3>
           <div className="flex flex-row border-2 border-black items-center">
-            <div className="px-1 border-r border-black">ContactID</div>
+            <div className="px-1 border-r border-black">InvoiceID</div>
             <div className="px-1 border-l border-black">{selectedInvoice?.InvoiceID ? selectedInvoice?.InvoiceID : 'None'}</div>
           </div>
         </div>

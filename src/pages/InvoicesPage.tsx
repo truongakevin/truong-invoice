@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppContext, NewButton, DeleteButton } from '../AppContext';
-import InvoiceForm from '../components/InvoiceForm';
+import InvoiceForm from '../forms/InvoiceForm';
 import List from '../components/List';
 import SearchBar from '../components/SearchBar';
 import ResizablePanel from '../components/ResizablePanel';
