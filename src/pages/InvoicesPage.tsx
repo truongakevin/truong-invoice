@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useAppContext, NewButton, DeleteButton } from '../AppContext';
 import InvoiceForm from '../components/InvoiceForm';
 import List from '../components/List';
@@ -7,21 +7,11 @@ import ResizablePanel from '../components/ResizablePanel';
 
 const InvoicesPage : React.FC = () => {
   const {
-    contacts,
-    fetchInvoices,
     filteredInvoicesWithContacts,
     services,
-    setSelectedContact,
     selectedInvoice,
     setSelectedInvoice,
   } = useAppContext();
-  
-  useEffect(() => {
-    if (selectedInvoice?.InvoiceID && selectedInvoice?.ContactID) {
-      setSelectedContact(contacts.find(contact => contact.ContactID === selectedInvoice?.ContactID))
-    }
-    fetchInvoices();
-  }, [selectedInvoice]);
 
   return (
     <ResizablePanel>
