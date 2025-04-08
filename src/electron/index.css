@@ -32,7 +32,7 @@ body {
     user-select: none;
   }
   .topbar > * {
-    -webkit-app-region: no-drag; /* Allow interaction with buttons or links */
+    -webkit-app-region: no-drag;
   }
   
   .topbar {
@@ -42,22 +42,18 @@ body {
   
   h1 {
     @apply text-2xl font-bold;
-    /* @apply text-3xl font-bold bg-red-500; */
   }
 
   h2 {
     @apply text-xl font-semibold;
-    /* @apply text-2xl font-semibold bg-orange-500; */
   }
 
   h3 {
     @apply text-lg font-semibold;
-    /* @apply text-lg font-semibold bg-yellow-500; */
   }
 
   h4 {
     @apply text-base font-semibold;
-    /* @apply text-base font-semibold bg-green-500; */
   }
 
   .inputdiv {
