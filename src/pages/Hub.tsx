@@ -3,6 +3,9 @@ import { useAppContext } from '../AppContext';
 import InvoicesPage from './InvoicesPage';
 import ContactsPage from './ContactsPage';
 import EstimatesPage from './EstimatesPage';
+import PaymentsPage from './PaymentsPage';
+// import HomePage from './HomePage';
+// import SettingsPage from './SettingPage';
 
 const WindowButtons: React.FC = () => {
   return (
@@ -42,19 +45,21 @@ const Hub: React.FC = () => {
   } = useAppContext();
 
   return (
-    <div className="flex flex-col w-screen h-screen justify-normal text-xs text-black p-0 m-0 border-0 bg-white">
+    <div className="flex flex-col w-screen h-screen text-xs text-black p-0 m-0 border-0 bg-white">
       <div className="bg-green-800 shadow-lg topbar flex flex-row justify-between p-4 pb-0 text-white">
           <h1 className="pb-4">TruongInvoice</h1>
           <Navagation />
           <WindowButtons />
       </div>
 
-      <div className="overflow-hidden">
-        <div className="w-full h-full p-4">
+      <div className="overflow-hidden h-full">
+        <div className="w-full h-full p-4 ">
           {activeTab === 'Contacts' && <ContactsPage />}
           {activeTab === 'Invoices' && <InvoicesPage />}
-          {/* {activeTab === 'Estimates' && <EstimatesPage />} */}
-          {/* {activeTab === 'Payments' && <PaymentsPage />} */}
+          {activeTab === 'Estimates' && <EstimatesPage />}
+          {activeTab === 'Payments' && <PaymentsPage />}
+          {/* {activeTab === 'Home' && <HomePage />}
+          {activeTab === 'Settings' && <SettingsPage />} */}
         </div>
       </div>
     </div>
