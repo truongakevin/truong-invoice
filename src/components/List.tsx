@@ -73,14 +73,14 @@ const List = <T extends Record<string, any>>({
   }, [selectedCell, items]);
 
   return (
-    <div className="overflow-y-auto overflow-x-auto rounded-lg border-2 border-green-800">
+    <div className="overflow-y-auto overflow-x-auto border-2 rounded border-green-800">
       <table className="w-full">
         <thead>
           <tr>
             {fieldNames.map((header, index) => (
               <th
                 key={header}
-                className="sticky top-0 px-2 py-2 text-left text-white bg-green-800 cursor-pointer"
+                className="sticky top-0 px-2 py-2 text-left text-white bg-green-800 cursor-pointer whitespace-nowrap"
                 onClick={() => handleSort(fieldValues[index])}
               >
                 {`${header}${sortKey === fieldValues[index] ? (sortOrder === 'asc' ? ' ↓ ' : ' ↑ ') : '\u00A0\u00A0\u00A0\u00A0'}`}
@@ -92,7 +92,7 @@ const List = <T extends Record<string, any>>({
           {sortedItems.map((item, index) => (
             <tr
             key={index}
-            className={`transition ${selectedCell && item[fieldValues[0]] === selectedCell[fieldValues[0]] ? 'selected-row border-0 border-green-800 bg-green-100' : 'even:bg-white odd:bg-neutral-100 hover:bg-green-50'}`}
+            className={`transition whitespace-nowrap ${selectedCell && item[fieldValues[0]] === selectedCell[fieldValues[0]] ? 'selected-row border-0 border-green-800 bg-green-100' : 'even:bg-white odd:bg-neutral-100 hover:bg-green-50'}`}
             onClick={() => setSelectedCell && setSelectedCell(item)}
           >
             {fieldValues.map((key, idx) => (

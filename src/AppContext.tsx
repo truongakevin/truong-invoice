@@ -107,8 +107,6 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
 
     if (saveContact?.ContactID && saveInvoice?.InvoiceDate) {
-      saveInvoice.ContactID = saveContact.ContactID
-
       const totalAmount = saveServices?.reduce((acc, { Quantity, Rate }) => acc + (Quantity * Rate || 0), 0).toFixed(2);
       saveInvoice.TotalAmount = parseFloat(totalAmount);
 
@@ -120,6 +118,10 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         await window.electron.ipcRenderer.invoke('update-invoice', saveInvoice);
         console.log("updated invoice");
       } else {
+        saveInvoice.ContactID = saveContact.ContactID
+
+        saveInvoice.Status = "Unpaid";
+
         const invoice = await window.electron.ipcRenderer.invoke('create-invoice', saveInvoice);
         saveInvoice.InvoiceID = invoice.InvoiceID;
         console.log("created inovice");

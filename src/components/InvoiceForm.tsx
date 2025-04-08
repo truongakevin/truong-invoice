@@ -15,7 +15,7 @@ const InvoiceForm : React.FC = () => {
 
   useEffect(() => {
     if (selectedInvoice?.InvoiceID && selectedInvoice?.ContactID) {
-      setSelectedContact(contacts.find(contact => contact.ContactID === selectedInvoice?.ContactID))
+      setSelectedContact(contacts.find(contact => contact.ContactID === selectedInvoice?.ContactID));
     }
     if (!selectedInvoice?.InvoiceDate) {
       setSelectedInvoice({
@@ -29,9 +29,6 @@ const InvoiceForm : React.FC = () => {
   return (
     <div className="w-full h-full flex flex-col gap-2 overflow-y-auto">
         <ContactForm />
-
-
-
 
         <div className='flex flex-row justify-between font-bold'>
           <h3 className="">Invoice Date</h3>

@@ -44,16 +44,17 @@ const Hub: React.FC = () => {
   return (
     <div className="flex flex-col w-screen h-screen justify-normal text-xs text-black p-0 m-0 border-0 bg-white">
       <div className="bg-green-800 shadow-lg topbar flex flex-row justify-between p-4 pb-0 text-white">
-          <WindowButtons />
-          <Navagation />
           <h1 className="pb-4">TruongInvoice</h1>
+          <Navagation />
+          <WindowButtons />
       </div>
 
       <div className="overflow-hidden">
         <div className="w-full h-full p-4">
           {activeTab === 'Contacts' && <ContactsPage />}
           {activeTab === 'Invoices' && <InvoicesPage />}
-          {activeTab === 'Estimates' && <EstimatesPage />}
+          {/* {activeTab === 'Estimates' && <EstimatesPage />} */}
+          {/* {activeTab === 'Payments' && <PaymentsPage />} */}
         </div>
       </div>
     </div>
