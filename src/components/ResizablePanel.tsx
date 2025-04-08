@@ -34,8 +34,7 @@ const ResizablePanel: React.FC<ResizablePanelProps> = ({
         <div className="w-full flex flex-col gap-4"
           style={{ width: `${leftWidth}%` }}
         >
-            {/* Left panel */}
-            {leftPanelContent}
+          {leftPanelContent}
         </div>
         <div
           ref={panelRef}
@@ -45,7 +44,6 @@ const ResizablePanel: React.FC<ResizablePanelProps> = ({
         <div className="w-full h-full"
           style={{ width: `${100 - leftWidth}%` }}
         >
-          {/* Right panel */}
           {rightPanelContent}
         </div>
       </div>
